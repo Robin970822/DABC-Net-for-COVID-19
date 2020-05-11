@@ -9,10 +9,8 @@ from evaluate_performance_mouse_pipe import my_evaluate1
 
 tag = 1
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-model_name = 'Lung_models3_V86'
+model_name = 'Covid_models3_V86'
 model = M.BCDU_net_D3(input_size=(4, 256, 256, 1), load_weighted=model_name)
-
-print(npy_path)
 
 for name in tqdm(config.npy_path):
     patientID = os.path.basename(name).split('.')[0] 
@@ -27,8 +25,10 @@ for name in tqdm(config.npy_path):
 
     if test_vol.shape[0] % 4 != 0:  
         cut = test_vol.shape[0] % 4
-        test_vol = test_vol[:-cut]  
-        # test_mask = test_mask[:-cut]
+        extend = 4 - cut
+        extend_vol = np.zeros([extend, test_vol.shape[1], test_vol.shape[2], test_vol.shape[3]])
+        test_vol = np.concatenate((test_vol, extend_vol), axis=0)
+        # test_mask = np.concatenate((test_mask, extend_vol), axis=0)
     assert test_vol.shape[0] % 4 == 0
 
     '''
@@ -43,7 +43,7 @@ for name in tqdm(config.npy_path):
     # return:(slices,256,256,1)
     pred = my_evaluate1(test_vol, test_mask, model,
                         model_name_id=model_name_id)
-    pred_path = os.path.join(config.lung_root, '{}_pred_lung.npy'.format(patientID))
+    pred_path = os.path.join(config.lesion_root, '{}_pred_lesion.npy'.format(patientID))
     print('Pred shape: {} in {}'.format(pred.shape, pred_path))
     np.save(pred_path, pred)
 

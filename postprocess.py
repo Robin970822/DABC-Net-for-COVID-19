@@ -7,26 +7,36 @@ from tqdm import tqdm
 from utils import prob2binary
 
 
-def calculate_volume(lung, lesion, meta):
+def calculate_volume(raw, lung, lesion, meta):
+    lung = prob2binary(lung)
+    lesion = prob2binary(lesion)
+    lesion = lesion * lung
     former_slice = 0
     res_list = []
     for index, row in meta.iterrows():
         slices = row['slice']
         spacing = eval(row['spacing'])
         origin_shape = eval(row['shape'])
-        size_factor = (origin_shape[1] * origin_shape[2]) / (lung.shape[1] * lung.shape[2])
+        size_factor = (origin_shape[1] * origin_shape[2]
+                       ) / (lung.shape[1] * lung.shape[2])
         voxel_size = spacing[0] * spacing[1] * spacing[2] * size_factor
 
         total_slice = lung.shape[0]
         current_slice = np.min([former_slice + slices, total_slice])
-        lung_volume = np.sum(prob2binary(
-            lung[former_slice:current_slice])) * voxel_size
-        lesion_volume = np.sum(prob2binary(
-            lesion[former_slice:current_slice])) * voxel_size
+        lung_volume = np.sum(lung[former_slice:current_slice]) * voxel_size
+        lesion_volume = np.sum(lesion[former_slice:current_slice]) * voxel_size
+        lung_lesion_volume = np.sum(
+            lesion[former_slice:current_slice] * lung[former_slice:current_slice]) * voxel_size
+        weighted_lesion_volume = np.sum(
+            lesion[former_slice:current_slice] * raw[former_slice:current_slice]) * voxel_size
 
         ratio = lesion_volume / lung_volume
-        res_list.append({'patientID': patientID, 'lung': lung_volume,
-                         'lesion': lesion_volume, 'ratio': ratio})
+        res_list.append({
+            'lung': lung_volume,
+            'lesion': lesion_volume,
+            'ratio': ratio,
+            'lung_lesion': lung_lesion_volume,
+            'weighted_lesion': weighted_lesion_volume})
         former_slice = current_slice
     return res_list
 
@@ -51,9 +61,9 @@ for name in tqdm(config.npy_path):
     assert len(lesion.shape) == 3
     assert len(lung.shape) == 3
 
-    res_list = calculate_volume(lung, lesion, meta)
+    res_list = calculate_volume(raw_data, lung, lesion, meta)
     res_df = pd.DataFrame(res_list)
     new_meta = pd.concat([meta, res_df], axis=1)
     total_data = pd.concat([total_data, new_meta])
 
-total_data.to_csv('total_data.csv')
+total_data.to_csv('total_data_severe.csv')
