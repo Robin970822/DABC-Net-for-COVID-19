@@ -6,6 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 from utils import write_itk_imageArray
 from scipy.misc.pilutil import imresize
+from postprocess import remove_small
 
 
 def resize(data, shape):
@@ -37,18 +38,21 @@ def save_nii(lung, lesion, meta):
 
         write_itk_imageArray(lung_volume, lung_path)
         write_itk_imageArray(lesion_volume, lesion_path)
+        former_slice = current_slice
 
 
-for name in tqdm(config.npy_path):
-    patientID = os.path.basename(name).split('.')[0]
-    raw_path = os.path.join(config.raw_root, '{}.npy'.format(patientID))
-    lung_path = os.path.join(
-        config.lung_root, '{}_pred_lung.npy'.format(patientID))
-    lesion_path = os.path.join(
-        config.lesion_root, '{}_pred_lesion.npy'.format(patientID))
-    meta_path = os.path.join(config.meta_root, '{}.csv'.format(patientID))
-    raw_data = np.load(raw_path)
-    lung = np.load(lung_path)
-    lesion = np.load(lesion_path)
-    meta = pd.read_csv(meta_path, index_col=[0])
-    save_nii(lung, lesion, meta)
+if __name__ == '__main__':
+    for name in tqdm(config.npy_path):
+        patientID = os.path.basename(name).split('.')[0]
+        raw_path = os.path.join(config.raw_root, '{}.npy'.format(patientID))
+        lung_path = os.path.join(
+            config.lung_root, '{}_pred_lung.npy'.format(patientID))
+        lesion_path = os.path.join(
+            config.lesion_root, '{}_pred_lesion.npy'.format(patientID))
+        meta_path = os.path.join(config.meta_root, '{}.csv'.format(patientID))
+        raw_data = np.load(raw_path)
+        lung = np.load(lung_path)
+        lesion = np.load(lesion_path)
+        meta = pd.read_csv(meta_path, index_col=[0])
+        lung = remove_small(lung, slices=lung.shape[0])
+        save_nii(lung, lesion, meta)

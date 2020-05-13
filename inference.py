@@ -1,15 +1,22 @@
 import os
 import time
 import config
+import argparse
 import numpy as np
 import models3_V86 as M
 
 from tqdm import tqdm
-from evaluate_performance_mouse_pipe import my_evaluate1
+from evaluate_pipe import my_evaluate1
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-m', '--model', default='Lung')
+args = parser.parse_args()
+
+model_type = args.model
 
 tag = 1
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-model_name = 'Covid_models3_V86'
+model_name = '{}_models3_V86_Multicenter'.format(model_type)
 model = M.BCDU_net_D3(input_size=(4, 256, 256, 1), load_weighted=model_name)
 
 for name in tqdm(config.npy_path):
@@ -43,7 +50,10 @@ for name in tqdm(config.npy_path):
     # return:(slices,256,256,1)
     pred = my_evaluate1(test_vol, test_mask, model,
                         model_name_id=model_name_id)
-    pred_path = os.path.join(config.lesion_root, '{}_pred_lesion.npy'.format(patientID))
+    if model_type == 'Covid':
+        pred_path = os.path.join(config.lesion_root, '{}_pred_lesion.npy'.format(patientID))
+    elif model_type == 'Lung':
+        pred_path = os.path.join(config.lung_root, '{}_pred_lung.npy'.format(patientID))
     print('Pred shape: {} in {}'.format(pred.shape, pred_path))
     np.save(pred_path, pred)
 
