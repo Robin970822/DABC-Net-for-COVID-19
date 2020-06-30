@@ -8,6 +8,13 @@ from scipy.stats import ttest_ind, f
 label_font = {'family': 'Times New Roman', 'size': 24}
 
 
+def crop_volume(volume, crop):
+    volume_ = volume.copy()
+    volume_[:crop[0]] = 0
+    volume_[-crop[1]:] = 0
+    return volume_
+
+
 def prob2binary(prob, thres=0.5):
     res = np.zeros_like(prob)
     res[prob > 0.5] = 1

@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
-from utils import prob2binary
+from utils import prob2binary, crop_volume
 from skimage import morphology
 
 
@@ -13,7 +13,7 @@ def remove_small(data, slices, min_size=64):
     new_data = np.zeros_like(data)
     for i in range(slices):
         new_data[i, :, :] = morphology.remove_small_objects(data[i, :, :].astype(np.int), min_size=int(
-            np.sin(i / slices * 3.14) * min_size), connectivity=1, in_place=True)
+            np.sin(i / slices * 3.14) * min_size), connectivity=8, in_place=True)
     return new_data
 
 
@@ -57,7 +57,7 @@ def get_consolidation(raw_data, lung, lesion, thres=0.5):
     return thres_image_open
 
 
-def calculate_volume(raw, lung, lesion, meta):
+def calculate_volume(raw, lung, lesion, meta, crop=[0, 0]):
     lung = prob2binary(lung)
     lesion = prob2binary(lesion)
     lung_lesion = lesion * lung
@@ -79,6 +79,10 @@ def calculate_volume(raw, lung, lesion, meta):
         lesion_current = lesion[former_slice:current_slice]
         lung_lesion_current = lung_lesion[former_slice:current_slice]
         raw_current = raw[former_slice:current_slice]
+        if crop[0] > 0:
+            lung_current = crop_volume(lung_current, (np.array(crop) * slices).astype('int'))
+            lesion_current = crop_volume(lesion_current, (np.array(crop) * slices).astype('int'))
+            lung_lesion_current = crop_volume(lung_lesion_current, (np.array(crop) * slices).astype('int'))
 
         left_lung, right_lung = get_left_right(lung, mid)
         left_lesion, right_lesion = get_left_right(lesion, mid)
@@ -100,7 +104,7 @@ def calculate_volume(raw, lung, lesion, meta):
             consolidation_volume, lesion_consolidation_volume
         ] = map(lambda x: np.sum(x) * voxel_size, calculate_list)
 
-        z = get_z(lesion)
+        z = get_z(lesion_current)
 
         ratio = lesion_volume / lung_volume
         res_list.append({
@@ -144,7 +148,10 @@ if __name__ == '__main__':
         assert len(lung.shape) == 3
 
         # lung = remove_small(lung, slices=lung.shape[0], min_size=16)
-        res_list = calculate_volume(raw_data, lung, lesion, meta)
+        if config.rotate == '_rotate':
+            lung = np.flip(lung, axis=1)
+            lesion = np.flip(lesion, axis=1)
+        res_list = calculate_volume(raw_data, lung, lesion, meta, crop=[0.17, 0.08])
         res_df = pd.DataFrame(res_list)
         new_meta = pd.concat([meta, res_df], axis=1)
         total_data = pd.concat([total_data, new_meta])
