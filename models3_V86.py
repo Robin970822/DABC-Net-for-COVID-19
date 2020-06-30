@@ -1,19 +1,19 @@
 from __future__ import division
 from keras.models import Model
-from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, UpSampling2D, Reshape, core, Dropout, TimeDistributed
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from keras import backend as K
-from keras.utils.vis_utils import plot_model as plot
-from keras.optimizers import SGD
-from keras.optimizers import *
 from keras.layers import *
+from keras.optimizers import Adam
+from keras import backend as K
 
 from keras.losses import binary_crossentropy
 # from keras.losses import a
 import tensorflow as tf
 
 smooth = 0.001
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+K.set_session(tf.Session(config=config))
+
 
 def dice_coef(y_true, y_pred, smooth=1):  # 3D
     intersection = K.sum(y_true * y_pred, axis=[1, 2, 3])
