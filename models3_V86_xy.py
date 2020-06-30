@@ -15,6 +15,134 @@ import tensorflow as tf
 
 smooth = 0.001
 
+
+def _bernoulli(shape, mean):
+    return tf.nn.relu(tf.sign(mean - tf.random_uniform(shape, minval=0, maxval=1, dtype=tf.float32)))
+
+
+class DropBlock2D(tf.keras.layers.Layer):
+    def __init__(self, keep_prob, block_size, scale=True, **kwargs):
+        super(DropBlock2D, self).__init__(**kwargs)
+        self.keep_prob = float(keep_prob) if isinstance(
+            keep_prob, int) else keep_prob
+        self.block_size = int(block_size)
+        self.scale = tf.constant(scale, dtype=tf.bool) if isinstance(
+            scale, bool) else scale
+
+    def compute_output_shape(self, input_shape):
+        return input_shape
+
+    def build(self, input_shape):
+        assert len(input_shape) == 4
+        # _, self.h, self.w, self.channel = input_shape.as_list()  # 元组，需要通过as_list()的操作转换成list.(tf中？)
+        # https://blog.csdn.net/m0_37393514/article/details/82226754
+        _, self.h, self.w, self.channel = input_shape[-4], input_shape[-3], input_shape[-2], input_shape[-1]
+        # pad the mask
+        p1 = (self.block_size - 1) // 2
+        p0 = (self.block_size - 1) - p1
+        self.padding = [[0, 0], [p0, p1], [p0, p1], [0, 0]]
+        self.set_keep_prob()
+        super(DropBlock2D, self).build(input_shape)
+
+    def call(self, inputs, training=None, **kwargs):
+        def drop():
+            mask = self._create_mask(tf.shape(inputs))
+            output = inputs * mask
+            output = tf.cond(self.scale,
+                             true_fn=lambda: output *
+                             tf.to_float(tf.size(mask)) / tf.reduce_sum(mask),
+                             false_fn=lambda: output)
+            return output
+
+        if training is None:
+            training = K.learning_phase()
+        output = tf.cond(tf.logical_or(tf.logical_not(training), tf.equal(self.keep_prob, 1.0)),
+                         true_fn=lambda: inputs,
+                         false_fn=drop)
+        return output
+
+    def set_keep_prob(self, keep_prob=None):
+        """This method only supports Eager Execution"""
+        if keep_prob is not None:
+            self.keep_prob = keep_prob
+        w, h = tf.to_float(self.w), tf.to_float(self.h)
+        self.gamma = (1. - self.keep_prob) * (w * h) / (self.block_size ** 2) / \
+                     ((w - self.block_size + 1) * (h - self.block_size + 1))
+
+    def _create_mask(self, input_shape):
+        sampling_mask_shape = tf.stack([input_shape[0],
+                                        self.h - self.block_size + 1,
+                                        self.w - self.block_size + 1,
+                                        self.channel])
+        mask = _bernoulli(sampling_mask_shape, self.gamma)
+        mask = tf.pad(mask, self.padding)
+        mask = tf.nn.max_pool(mask, [1, self.block_size, self.block_size, 1], [
+                              1, 1, 1, 1], 'SAME')
+        mask = 1 - mask
+        return mask
+
+
+class DropBlock3D(tf.keras.layers.Layer):
+    def __init__(self, keep_prob, block_size, scale=True, **kwargs):
+        super(DropBlock3D, self).__init__(**kwargs)
+        self.keep_prob = float(keep_prob) if isinstance(
+            keep_prob, int) else keep_prob
+        self.block_size = int(block_size)
+        self.scale = tf.constant(scale, dtype=tf.bool) if isinstance(
+            scale, bool) else scale
+
+    def compute_output_shape(self, input_shape):
+        return input_shape
+
+    def build(self, input_shape):
+        assert len(input_shape) == 5
+        _, self.d, self.h, self.w, self.channel = input_shape.as_list()
+        # pad the mask
+        p1 = (self.block_size - 1) // 2
+        p0 = (self.block_size - 1) - p1
+        self.padding = [[0, 0], [p0, p1], [p0, p1], [p0, p1], [0, 0]]
+        self.set_keep_prob()
+        super(DropBlock3D, self).build(input_shape)
+
+    def call(self, inputs, training=None, **kwargs):
+        def drop():
+            mask = self._create_mask(tf.shape(inputs))
+            output = inputs * mask
+            output = tf.cond(self.scale,
+                             true_fn=lambda: output *
+                             tf.to_float(tf.size(mask)) / tf.reduce_sum(mask),
+                             false_fn=lambda: output)
+            return output
+
+        if training is None:
+            training = K.learning_phase()
+        output = tf.cond(tf.logical_or(tf.logical_not(training), tf.equal(self.keep_prob, 1.0)),
+                         true_fn=lambda: inputs,
+                         false_fn=drop)
+        return output
+
+    def set_keep_prob(self, keep_prob=None):
+        """This method only supports Eager Execution"""
+        if keep_prob is not None:
+            self.keep_prob = keep_prob
+        d, w, h = tf.to_float(self.d), tf.to_float(self.w), tf.to_float(self.h)
+        self.gamma = ((1. - self.keep_prob) * (d * w * h) / (self.block_size ** 3) /
+                      ((d - self.block_size + 1) * (w - self.block_size + 1) * (h - self.block_size + 1)))
+
+    def _create_mask(self, input_shape):
+        sampling_mask_shape = tf.stack([input_shape[0],
+                                        self.d - self.block_size + 1,
+                                        self.h - self.block_size + 1,
+                                        self.w - self.block_size + 1,
+                                        self.channel])
+        mask = _bernoulli(sampling_mask_shape, self.gamma)
+        mask = tf.pad(mask, self.padding)
+        mask = tf.nn.max_pool3d(mask, [
+                                1, self.block_size, self.block_size, self.block_size, 1], [1, 1, 1, 1, 1], 'SAME')
+        mask = 1 - mask
+        return mask
+
+
 def dice_coef(y_true, y_pred, smooth=1):  # 3D
     intersection = K.sum(y_true * y_pred, axis=[1, 2, 3])
     union = K.sum(y_true, axis=[1, 2, 3]) + K.sum(y_pred, axis=[1, 2, 3])
@@ -132,10 +260,10 @@ def slice_at_block(inputlayer, outdim, name='None'):
 
 
 # 原(256,256,1) / ( batchs ,512,512,1)
-def BCDU_net_D3(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None):
+def BCDU_net_D3(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, is_trainable=True):
     slices = input_size[0]  # 10
     N = input_size[1]  # 原:0  N代表图的长宽：256（这里长和宽相等）
-    droprate = 0.2  # 0.5
+    droprate = 0.5  # 0.5
 
     inputs = Input(input_size)
     conv1 = TimeDistributed(Conv2D(64, 3, activation='relu', padding='same',
@@ -157,20 +285,27 @@ def BCDU_net_D3(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=N
     # conv3 = TimeDistributed(Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal'))(conv3)
     conv3 = resconv(pool2, 256, name='res_block2', is_batchnorm=True)
 
-    drop3 = TimeDistributed(Dropout(droprate))(conv3)
+    # drop3 = TimeDistributed(Dropout(droprate))(conv3, training=is_trainable)
+    drop3 = TimeDistributed(DropBlock2D(0.5, 3))(
+        conv3, training=is_trainable)  # 05/26
+
     pool3 = TimeDistributed(MaxPooling2D(pool_size=(2, 2)))(conv3)
     # D1
     conv4 = TimeDistributed(Conv2D(512, 3, activation='relu',
                                    padding='same', kernel_initializer='he_normal'))(pool3)
     conv4_1 = TimeDistributed(Conv2D(
         512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv4)
-    drop4_1 = TimeDistributed(Dropout(droprate))(conv4_1)
+    # drop4_1 = TimeDistributed(Dropout(droprate))(conv4_1, training=is_trainable)
+    drop4_1 = TimeDistributed(DropBlock2D(0.5, 3))(
+        conv4_1, training=is_trainable)
     # D2
     conv4_2 = TimeDistributed(Conv2D(
         512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(drop4_1)
     conv4_2 = TimeDistributed(Conv2D(
         512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv4_2)
-    conv4_2 = TimeDistributed(Dropout(droprate))(conv4_2)
+    # conv4_2 = TimeDistributed(Dropout(droprate))(conv4_2, training=is_trainable)
+    conv4_2 = TimeDistributed(DropBlock2D(0.5, 3))(
+        conv4_2, training=is_trainable)
     # D3
     merge_dense = concatenate([conv4_2, drop4_1], axis=-1)
     # concatenate 层不需要加TimeDistributed。否则报错。注意叠加的通道要明确。这里-1=4 即第5个(None,10,64,64,512)->(...,1024)
@@ -178,7 +313,9 @@ def BCDU_net_D3(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=N
         512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(merge_dense)
     conv4_3 = TimeDistributed(Conv2D(
         512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv4_3)
-    drop4_3 = TimeDistributed(Dropout(droprate))(conv4_3)
+    # drop4_3 = TimeDistributed(Dropout(droprate))(conv4_3, training=is_trainable)
+    drop4_3 = TimeDistributed(DropBlock2D(0.5, 3))(
+        conv4_3, training=is_trainable)
 
     up6 = TimeDistributed(Conv2DTranspose(
         256, kernel_size=2, strides=2, padding='same', kernel_initializer='he_normal'))(drop4_3)
@@ -247,6 +384,8 @@ def BCDU_net_D3(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=N
     conv8 = TimeDistributed(Conv2D(
         2, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv8)
     conv9 = TimeDistributed(Conv2D(1, 1, activation='sigmoid'))(conv8)
+    # conv9 = Dropout(0.5)(conv9, training=True)
+    # conv9 = TimeDistributed(DropBlock2D(0.5, 3))(conv9, training=True)  # 05/26
 
     # model = Model(input = inputs, output = merge6)
     model = Model(input=inputs, output=conv9)
@@ -262,7 +401,7 @@ def BCDU_net_D3(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=N
 # for plot
 
 if __name__ == '__main__':
-    from keras.utils import plot_model
+    # from keras.utils import plot_model
     a = BCDU_net_D3(input_size=(4, 256, 256, 1))
     a.summary()
-    plot_model(a, 'model3_V86.png', show_shapes=True)
+    # plot_model(a, 'model3_V86.png', show_shapes=True)
