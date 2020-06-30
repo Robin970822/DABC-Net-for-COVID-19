@@ -48,6 +48,8 @@ for name in tqdm(config.npy_path):
     epistemic = np.mean(p_hat ** 2, axis=0) - np.mean(p_hat, axis=0) ** 2
 
     print('Pred shape: {}'.format(np.squeeze(pred).shape))
+    print('aleatoric shape: {}'.format(np.squeeze(aleatoric).shape))
+    print('epistemic shape: {}'.format(np.squeeze(epistemic).shape))
     np.save(os.path.join(config.uncerten_root, '{}_pred.npy'.format(patientID)), np.squeeze(pred))
     np.save(os.path.join(config.uncerten_root, '{}_aleatoric.npy'.format(patientID)), np.squeeze(aleatoric))
     np.save(os.path.join(config.uncerten_root, '{}_epistemic.npy'.format(patientID)), np.squeeze(epistemic))
