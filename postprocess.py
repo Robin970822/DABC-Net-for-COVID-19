@@ -80,47 +80,76 @@ def calculate_volume(raw, lung, lesion, meta, crop=[0, 0]):
         lung_lesion_current = lung_lesion[former_slice:current_slice]
         raw_current = raw[former_slice:current_slice]
         if crop[0] > 0:
-            lung_current = crop_volume(lung_current, (np.array(crop) * slices).astype('int'))
-            lesion_current = crop_volume(lesion_current, (np.array(crop) * slices).astype('int'))
-            lung_lesion_current = crop_volume(lung_lesion_current, (np.array(crop) * slices).astype('int'))
+            lung_current = crop_volume(
+                lung_current, (np.array(crop) * slices).astype('int'))
+            lesion_current = crop_volume(
+                lesion_current, (np.array(crop) * slices).astype('int'))
+            lung_lesion_current = crop_volume(
+                lung_lesion_current, (np.array(crop) * slices).astype('int'))
 
-        left_lung, right_lung = get_left_right(lung, mid)
-        left_lesion, right_lesion = get_left_right(lesion, mid)
+        left_lung, right_lung = get_left_right(lung_current, mid)
+        left_lesion, right_lesion = get_left_right(lesion_current, mid)
+        left_raw, right_raw = get_left_right(raw_current, mid)
 
         consolidation = get_consolidation(
             raw_current, lung_current, lesion_current)
+        lesion_consolidation = lesion_current * consolidation
+        left_consolidation, right_consolidation = get_left_right(
+            lesion_consolidation, mid)
 
         calculate_list = [
             lung_current, lesion_current, lung_lesion_current,
             left_lung, right_lung, left_lesion, right_lesion,
+
             lesion_current * raw_current, lung_lesion_current * raw_current,
-            consolidation, consolidation * lesion_current
+            left_lesion * left_raw, right_lesion * right_raw,
+
+            consolidation, lesion_consolidation,
+            left_consolidation, right_consolidation
         ]
 
         [
             lung_volume, lesion_volume, lung_lesion_volume,
             left_lung_volume, right_lung_volume, left_lesion_volume, right_lesion_volume,
+
             weighted_lesion_volume, weighted_lung_lesion_volume,
-            consolidation_volume, lesion_consolidation_volume
+            left_weighted_lesion_volume, right_weighted_lesion_volume,
+
+            consolidation_volume, lesion_consolidation_volume,
+            left_consolidation_volume, right_consolidation_volume
         ] = map(lambda x: np.sum(x) * voxel_size, calculate_list)
 
         z = get_z(lesion_current)
+        left_z = get_z(left_lesion)
+        right_z = get_z(right_lesion)
 
         ratio = lesion_volume / lung_volume
-        res_list.append({
-            'lung': lung_volume,
-            'lesion': lesion_volume,
-            'ratio': ratio,
-            'lung_lesion': lung_lesion_volume,
-            'left_lung': left_lung_volume,
-            'right_lung': right_lung_volume,
-            'left_lesion': left_lesion_volume,
-            'right_lesion': right_lesion_volume,
-            'weighted_lesion': weighted_lesion_volume,
-            'weighted_lung_lesion': weighted_lung_lesion_volume,
-            'consolidation': consolidation_volume,
-            'lesion_consolidation': lesion_consolidation_volume,
-            'z': z})
+        res_list.append(
+            {
+                'lung': lung_volume,
+                'lesion': lesion_volume,
+                'ratio': ratio,
+                'lung_lesion': lung_lesion_volume,
+                'left_lung': left_lung_volume,
+                'right_lung': right_lung_volume,
+                'left_lesion': left_lesion_volume,
+                'right_lesion': right_lesion_volume,
+
+                'weighted_lesion': weighted_lesion_volume,
+                'weighted_lung_lesion': weighted_lung_lesion_volume,
+                'left_weighted_lesion': left_weighted_lesion_volume,
+                'right_weighted_lesion': right_weighted_lesion_volume,
+
+                'consolidation': consolidation_volume,
+                'lesion_consolidation': lesion_consolidation_volume,
+                'left_consolidation': left_consolidation_volume,
+                'right_consolidation': right_consolidation_volume,
+
+                'z': z,
+                'left_z': left_z,
+                'right_z': right_z,
+            }
+        )
         former_slice = current_slice
     return res_list
 
@@ -151,9 +180,11 @@ if __name__ == '__main__':
         if config.rotate == '_rotate':
             lung = np.flip(lung, axis=1)
             lesion = np.flip(lesion, axis=1)
-        res_list = calculate_volume(raw_data, lung, lesion, meta, crop=[0.17, 0.08])
+            # raw_data = np.flip(raw_data, axis=1)
+        res_list = calculate_volume(
+            raw_data, lung, lesion, meta, crop=[0.17, 0.08])
         res_df = pd.DataFrame(res_list)
         new_meta = pd.concat([meta, res_df], axis=1)
         total_data = pd.concat([total_data, new_meta])
 
-    total_data.to_csv(config.csv_name)
+    total_data.to_csv('lr_{}'.format(config.csv_name))
