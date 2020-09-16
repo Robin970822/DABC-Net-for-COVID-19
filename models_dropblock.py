@@ -188,8 +188,8 @@ def slice_at_block(inputlayer, outdim, name='None'):
     x = ConvLSTM2D(filters=convfilter, kernel_size=(3, 3), padding='same', return_sequences=True, go_backwards=False,
                    kernel_initializer='he_normal', activation='sigmoid', name=name + '_SABC')(x)
     x = TimeDistributed(Conv2D(
-        1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)  # 04/22
-    x_3 = Reshape((4, 16, outdim//16, 1))(x_3)  # 04/22 keras 有 reshape layers
+        1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x) 
+    x_3 = Reshape((4, 16, outdim//16, 1))(x_3)
     x_3 = ConvLSTM2D(filters=1, kernel_size=(5, 5), padding='same', return_sequences=True, go_backwards=False,
                      kernel_initializer='he_normal', activation='sigmoid', name=name + '_CABC')(x_3)
 
