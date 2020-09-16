@@ -183,7 +183,7 @@ def slice_at_block(inputlayer, outdim, name='None'):
     x = TimeDistributed(Conv2D(2, 1, padding='same', activation='relu', name=name + '_1*1'), name=name)(
         x_0)
     x = TimeDistributed(BatchNormalization(
-        axis=3, name=name + '_bn'), name='T_' + name + '_bn')(x)  # axis = 3 等价于 -1
+        axis=3, name=name + '_bn'), name='T_' + name + '_bn')(x)
     convfilter = 2
     x = ConvLSTM2D(filters=convfilter, kernel_size=(3, 3), padding='same', return_sequences=True, go_backwards=False,
                    kernel_initializer='he_normal', activation='sigmoid', name=name + '_SABC')(x)
