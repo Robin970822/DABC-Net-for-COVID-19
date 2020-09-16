@@ -2,7 +2,7 @@ import os
 import time
 import config
 import numpy as np
-import models3_V86_xy as M
+import models_dropblock as M
 
 from tqdm import tqdm
 from evaluate_pipe import my_evaluate1

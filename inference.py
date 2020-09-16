@@ -3,7 +3,7 @@ import time
 import config
 import argparse
 import numpy as np
-import models3_V86 as M
+import models as M
 
 from tqdm import tqdm
 from evaluate_pipe import my_evaluate1
