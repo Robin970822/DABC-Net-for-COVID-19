@@ -1,6 +1,6 @@
 # DABC-Net
 
-DABC-Net toolkit is desighed for easy-to-use, fast and real-time segmentation.
+DABC-Net toolkit is designed for easy-to-use, fast and real-time segmentation.
 It can provide insights of model performance to clinicians or medical experts by generating aleatory and epistemic uncertainty.
 
 This repository provide an implementation of DABC-Net (including graphical user interface) and early triage of critically ill automatically.
