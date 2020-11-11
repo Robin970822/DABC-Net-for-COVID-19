@@ -100,14 +100,17 @@ In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.
 #### Inference:
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
-```
+
+```python
 input_path = 'path/to/input_folder/'
 output_path = 'path/to/output_folder/
 
 infer_colab(input_path,output_path)
 ```
+
 #### Uncertainty:
-```
+
+```python
 input_file_path = 'path/to/input_filename/'
 output_file_path = 'path/to/output_folder/'
 
