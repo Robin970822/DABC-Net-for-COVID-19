@@ -64,8 +64,7 @@ pip install -r requirement.txt
 You can run our network even without installing Tensorflow or Python interpreter on you computer. 
 The UI looks like this:
 
-   ![Alt text](
-   /fig1.png "fig.1")
+   ![Alt text](fig/fig1.png "fig.1")
 
 2. Type or select the input folder where you store nii/nii.gz format CT scans data. The output results will be saved in the folder you specified.
 
