@@ -17,14 +17,14 @@ This repository provide an implementation of DABC-Net (including graphical user 
 [test]:
 annotation
 * [Installation](#installation)
-* [Quick start](#Quick_start)
-    + [DABC-Net for desktop app](#DABC-Net_for_desktop_app)
-    + [DABC-Net for Colab](#DABC-Net_for_Colab)
-    + [DABC-Net for Website](#DABC-Net_for_website)
-* [Progress prediction](#Progress_prediction)
+* [Quick start](#Quick-start)
+    + [DABC-Net for desktop app](#dabc-net_for-desktop-app)
+    + [DABC-Net for Colab](#dabc-net-for-colab)
+    + [DABC-Net for Website](#DABC-Net-for-website)
+* [Progress prediction](#progress-prediction)
     + [Model](#Model)
     + [Usage](#Usage)   
-    + [Visualization of progress](#Visualization_of_progress)
+    + [Visualization of progress](#Visualization-of-progress)
 * [Data](#Data)
     
 
