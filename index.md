@@ -14,8 +14,6 @@ This repository provide an implementation of DABC-Net (including graphical user 
 * Support for Covid-19 longitudinal study
 
 ## Table of Contents
-[test]:
-annotation
 * [Installation](#installation)
 * [Quick start](#Quick-start)
     + [DABC-Net for desktop app](#dabc-net_for-desktop-app)
@@ -26,17 +24,12 @@ annotation
     + [Usage](#Usage)   
     + [Visualization of progress](#Visualization-of-progress)
 * [Data](#Data)
-    
+  
 
 ## Installation
-(If you run toolkit with packaged destop app,
-you can skip this step.)
+If you run toolkit with packaged desktop app, you can skip this step.
 
-[/DABC-Net is only tested on Windows. It may work on other operating systems as well but we do not guarantee that it will.
-/]:
-test
-
-An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
+An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti GPU).
 
 Requirements:
 
@@ -214,8 +207,8 @@ Dataset with Expert Annotations and Benchmark
 * [1] - Ma Jun, Ge Cheng, Wang Yixin, An Xingle, Gao Jiantao, … He Jian. (2020). COVID-19 CT Lung and Infection Segmentation Dataset (Version Verson 1.0) [Data set]. Zenodo. [DOI](https://zenodo.org/record/3757476)
 
 Data Sources
-* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! | Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: <link> [Accessed 20 March 2020].
-* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia | Radiopaedia.Org. [online] Radiopaedia.org. Available at: <link> [Accessed 20 April 2020].
+* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries!  Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: <link> [Accessed 20 March 2020].
+* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia, Radiopaedia.Org. [online] Radiopaedia.org. Available at: <link> [Accessed 20 April 2020].
 
 # Notes
 
