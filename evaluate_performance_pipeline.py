@@ -1,10 +1,11 @@
 # import os
 import numpy as np
 import scipy
+# from keras import backend as K
+# from numba import cuda
 
-
-def my_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer=False, save_pred_img=False, quick_compute=True,
-                threshold_after_infer=0):
+def local_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer=False, save_pred_img=False, quick_compute=True,
+                   threshold_after_infer=0):
     '''
     Load data
     threshold_after_infer: float 0-1.
@@ -34,7 +35,7 @@ def my_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer=Fa
         '''
         stack patches to slices
         (slices,patches,H,W,1) -> (slices*patches,H,W)
-        :param data: None
+        :param data: None, as a placeholder.
         :param k: if k=1, save images.
         :return: stacked matrix.
         '''
