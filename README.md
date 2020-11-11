@@ -64,7 +64,8 @@ pip install -r requirement.txt
 You can run our network even without installing Tensorflow or Python interpreter on you computer. 
 The UI looks like this:
 
-   ![Alt text](fig\fig1.png "fig.1")
+   ![Alt text](
+   /fig1.png "fig.1")
 
 2. Type or select the input folder where you store nii/nii.gz format CT scans data. The output results will be saved in the folder you specified.
 
@@ -72,10 +73,10 @@ The UI looks like this:
 
 4. Click 'Run' button. After all the inference done, the progress bar window will be closed. 
    
-   ![fig.2](fig\fig2.png)   
+   ![fig.2](fig/fig2.png)   
    
    Here are some examples:
-   ![fig.4](fig\fig4.png )
+   ![fig.4](fig/fig4.png )
 
 #### Uncertainty:
 
@@ -90,11 +91,11 @@ In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.
 
 4. 'Method' denotes what kind of uncertainty you  want to save.
 
-   ![](fig\fig3.png)
+   ![](fig/fig3.png)
 
    Here are some examples:
 
-   ![](fig\fig5.png)
+   ![](fig/fig5.png)
 
 ## DABC-Net for Colab
 #### Inference:
@@ -190,20 +191,20 @@ Here are some examples:
 
 #### Progression curve of severe patient：
 
-![](fig\progress_curve_severe.png)
+![](fig/progress_curve_severe.png)
 
 #### Progression curve of mild patient：
 
-![](fig\progress_curve_mild.png)
+![](fig/progress_curve_mild.png)
 
 x-axis: time(day), y-axis: lesion ratio(%)
 
 
 #####  Visualization of different timepoint scans
 
-![](fig\progress_severe.png)
+![](fig/progress_severe.png)
 
-![](fig\progress_mild.png)
+![](fig/ogress_mild.png)
 
 # Data
 
