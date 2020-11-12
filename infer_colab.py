@@ -44,7 +44,7 @@ def infer_colab(nii_path='', save_path='', sform_code=0):
                           load_weighted=name)
 
 
-    pred = my_evaluate(test_vol, test_mask, model, model_name_id=None, only_infer=True, )
+    pred = local_evaluate(test_vol, test_mask, model, model_name_id=None, only_infer=True, )
 
 
     from read_all_data_from_nii_pipe import save_pred_to_nii
