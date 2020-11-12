@@ -54,6 +54,47 @@ You need to download this repository and run following command:
 cd path/to/repository/
 pip install -r requirement.txt
 ```
+The project folder looks like this:
+
+```
+path
+├─Input_data
+│      2020034797_0123_2949_20200123015940_4.nii.gz
+│      2020034797_0125_3052_20200125111145_4.nii.gz
+│      ...
+│
+├─Output_data
+│   │
+│   ├─covid
+│   │      2020034797_0123_2949_20200123015940_4.nii.gz
+│   │      2020034797_0125_3052_20200125111145_4.nii.gz
+│   │      ...
+│   │
+│   ├─lung
+│   │      2020034797_0123_2949_20200123015940_4.nii.gz
+│   │      2020034797_0125_3052_20200125111145_4.nii.gz
+│   │      ...
+│   │
+│   └─uncertainty
+│           2020034797_0123_2949_20200123015940_4_predictive_aleatoric.nii.gz
+│           2020034797_0125_3052_20200125111145_4_sample_1.nii.gz
+│           ...
+│
+├─weight
+│       model_05090017
+│       ...
+│
+│ (following folders are required if you need longitudinal study)
+│
+├─meta
+│       2020035021.csv
+│
+└─model
+        prediction.pkl
+        ...
+
+```
+
 
 ## Quick Start
 
@@ -105,52 +146,6 @@ Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 
 ![](fig/tool_visual.png)
 
-#### Path structure:
-
-```
-path
-├─Input_data
-│      2020034797_0123_2949_20200123015940_4.nii.gz
-│      2020034797_0125_3052_20200125111145_4.nii.gz
-│      ...
-│
-├─Output_data
-│   │  2020034797.csv
-│   │
-│   ├─covid
-│   │      2020034797_0123_2949_20200123015940_4.nii.gz
-│   │      2020034797_0125_3052_20200125111145_4.nii.gz
-│   │      ...
-│   │
-│   ├─lung
-│   │      2020034797_0123_2949_20200123015940_4.nii.gz
-│   │      2020034797_0125_3052_20200125111145_4.nii.gz
-│   │      ...
-│   │
-│   │
-│   └─uncertainty
-│           predictive_2020034797_0123_2949_20200123015940_4.nii.gz
-│           predictive_2020034797_0125_3052_20200125111145_4.nii.gz
-│           sample_0_2020034797_0123_2949_20200123015940_4.nii.gz
-│
-│
-├─weight
-│   │  model_05090017
-│   └─ ...
-│
-│ (following folders are required if you need longitudinal study)
-│
-├─meta
-│   └─  2020035021.csv
-│
-│
-└─model
-    │  prediction.pkl
-    └─ ...
-
-
-```
-
 
 
 ## DABC-Net for Colab
@@ -158,18 +153,35 @@ path
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
 ```
-input_path = 'path/to/input_folder/'
-output_path = 'path/to/output_folder/
-
-infer_colab(input_path,output_path)
+infer_colab(input_path, output_path)
 ```
+- nii_path : 
+    - Input: Folder path of input data(nii or nii.gz format).
+    - Type: string
+- save_path : Folder path of output data. The segmentation results will be saved as nii.gz format.
+    - Input: Folder path of input data(nii or nii.gz format).
+    - Type: string 
+- usage
+   - Input: Folder path of input data(nii or nii.gz format).
+   - Type: string, 'lung' or 'covid'
 #### Uncertainty:
 ```
-input_file_path = 'path/to/input_filename/'
-output_file_path = 'path/to/output_folder/'
-
-infer_uncertainty(input_file_path,output_file_path,sample_value=10,uc_chosen=Aleatoric)
+infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
 ```
+- nii_filename : 
+    - Input: Path of input data(nii or nii.gz format).
+    - Type: string
+- save_filename :
+    - Input: Folder path of input data(nii or nii.gz format).
+    - Type: string 
+- sample_value
+   - Input: number of Monte carlo samples.
+   - Type: int
+- uncertainty:
+   - Input: Choose uncertainty. The results will be saved as nii.gz format.
+   - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
+   
+
 For more detail, please refer to [notebook](https://drive.google.com/).
 
 ##  DABC-Net for Website
@@ -253,7 +265,7 @@ Here are some examples:
 
 ![](fig/progress_curve_mild.png)
 
-x-axis: time(day), y-axis: lesion ratio(%)
+x-axis: time(day), y-axis: lesion ratio
 
 
 #####  Visualization of different timepoint scans
@@ -270,38 +282,6 @@ Dataset with Expert Annotations and Benchmark
 Data Sources
 * [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! | Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: <link> [Accessed 20 March 2020].
 * [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia | Radiopaedia.Org. [online] Radiopaedia.org. Available at: <link> [Accessed 20 April 2020].
-
-# Tutorial
-```
-infer_colab(nii_path, save_path, usage='covid')
-```
-- nii_path : 
-    - Input: Folder path of input data(nii or nii.gz format).
-    - Type: string
-- save_path : Folder path of output data. The segmentation results will be saved as nii.gz format.
-    - Input: Folder path of input data(nii or nii.gz format).
-    - Type: string 
-- usage
-   - Input: Folder path of input data(nii or nii.gz format).
-   - Type: string, 'lung' or 'covid'
-
-```
-infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty)
-```
-- nii_filename : 
-    - Input: Path of input data(nii or nii.gz format).
-    - Type: string
-- save_path :
-    - Input: Folder path of input data(nii or nii.gz format).
-    - Type: string 
-- sample_value
-   - Input: number of Monte carlo samples.
-   - Type: int
-- uncertainty:
-   - Input: Choose uncertainty. The results will be saved as nii.gz format.
-   - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
-   
-
 
 
 # Notes
