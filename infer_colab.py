@@ -21,7 +21,7 @@ def infer_colab(nii_path='', save_path='', sform_code=0):
     '''
 
     '''
-    from evaluate_performance_pipeline import my_evaluate
+    from evaluate_performance_pipeline import local_evaluate
 
     print('\n**********\tInferring CT scans:\t**********\n')
 
