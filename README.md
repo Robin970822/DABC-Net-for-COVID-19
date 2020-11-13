@@ -29,10 +29,6 @@ This repository provide an implementation of DABC-Net (including graphical user 
 ## Installation
 If you run toolkit with packaged destop app, you can skip this step.
 
-[/DABC-Net is only tested on Windows. It may work on other operating systems as well but we do not guarantee that it will.
-/]:
-test
-
 An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
 Requirements:
@@ -93,7 +89,6 @@ path
 
 ```
 
-
 ## Quick Start
 
 ### DABC-Net for desktop app
@@ -119,7 +114,6 @@ The UI looks like this:
 
 In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.nips.cc/paper/8271-dropblock-a-regularization-method-for-convolutional-networks), a form of Monte Carlo dropout. For more details about aleatory and epistemic uncertainty, please refer to this [paper](https://pdfs.semanticscholar.org/146f/8844a380191a3f883c3584df3d7a6a56a999.pdf).
 
-
 1. Follow instructions from item(1-3) in the section above.
 
 2. Choose sample times (integer, e.g. 10). The network will sample 10 times to  compute aleatory/epistemic uncertainty and get mean prediction outcome as final segmentation.
@@ -143,8 +137,6 @@ In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.
 Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 
 ![](fig/tool_visual.png)
-
-
 
 ## DABC-Net for Colab
 #### Inference:
@@ -192,34 +184,22 @@ coming soon
 ### Feature
 Feature we used:
 
-| Feature                    | Scan |
-| -------------------------  | ----------  |
-| Left lesion volume	     | scan0        |
-| Left lung volume	     | scan0        |
-| Left lesion ratio	     | scan0        |
-| Left consolidation volume  | scan0        |
-| Left weighted volume       | scan0        |
-| Left z-position            | scan0        |
-| Right lesion volume	     | scan0        |
-| Right lung volume	     | scan0        |
-| Right lesion ratio	     | scan0        |
-| Right consolidation volume | scan0        |
-| Right weighted volume      | scan0        |
-| Right z-position           | scan0        |
-| Left lesion volume	     | scan1        |
-| Left lung volume	     | scan1        |
-| Left lesion ratio	     | scan1        |
-| Left consolidation volume  | scan1        |
-| Left weighted volume       | scan1        |
-| Left z-position            | scan1        |
-| Right lesion volume	     | scan1        |
-| Right lung volume	     | scan1        |
-| Right lesion ratio	     | scan1        |
-| Right consolidation volume | scan1        |
-| Right weighted volume      | scan1        |
-| Right z-position           | scan1        |
-| Age		             | scan1        |
-| Sex		             | scan1        |
+| Feature                   | Scan |
+| ------------------------- | ------------ |
+| Left lesion volume        | scan0 & scan1|
+| Left lung volume          | scan0 & scan1|
+| Left lesion ratio         | scan0 & scan1|
+| Left consolidation volume | scan0 & scan1|
+| Left weighted volume      | scan0 & scan1|
+| Left z-position           | scan0 & scan1|
+| Right lesion volume       | scan0 & scan1|
+| Right lung volume         | scan0 & scan1|
+| Right lesion ratio        | scan0 & scan1|
+| Right consolidation volume| scan0 & scan1|
+| Right weighted volume     | scan0 & scan1|
+| Right z-position          | scan0 & scan1|
+| Age                       | scan0 & scan1|
+| Sex		                | scan0 & scan1|
 
 ### Base learner
 Base learners we used:
@@ -236,7 +216,7 @@ Base learners we used:
 |XGBoost		| False | True	|
 
 #### MinMaxScalar
-For base learners sensetive to data scale(svm, mlp, ...), we provide the min max scalar based on our training dataset. The weights without min max scalar (TODO) are also provided with fewer base learners and lower performance.
+For base learners sensitive to data normalization(svm, mlp, ...), we provide the min max normalization based on our training dataset. The weights without min max scalar (TODO) are also provided with fewer base learners and lower performance.
 
 ## Usage
 ### Prediction
@@ -266,7 +246,6 @@ Here are some examples:
 
 x-axis: time(day), y-axis: lesion ratio
 
-
 #####  Visualization of different timepoint scans
 
 ![](fig/progress_severe.png)
@@ -282,13 +261,9 @@ Data Sources
 * [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! \| Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [<link>](https://Coronacases.org) [Accessed 20 March 2020].
 * [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia \| Radiopaedia.Org. [online] Radiopaedia.org. Available at: [<link>](https://Radiopaedia.org) [Accessed 20 April 2020].
 
-
 # Notes
 
 Acknowledgements: We thank [COVID-19-CT-Seg-Benchmark repository](https://github.com/JunMa11/COVID-19-CT-Seg-Benchmark) for providing covid-19 segmentation dataset and benchmark. We also thank this [repository](https://github.com/EdwinZhang1970/Python/tree/master/tkinter-pack%20Demo) for providing us ideas for designing ui.
-
-
-
 
 Disclaimer: This toolkit is only for research purpose and not approved for clinical use.
 
