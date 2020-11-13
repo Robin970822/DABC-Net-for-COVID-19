@@ -39,7 +39,7 @@ An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
 Requirements:
 
-* tensorflow-gpu == 1.15
+* tensorflow-gpu == 1.15.4
 * Keras == 2.2.4
 * numpy == 1.16
 * scikit-learn == 0.21.3
@@ -95,11 +95,11 @@ path
 
 ```
 
-
 ## Quick Start
 
 ### DABC-Net for desktop app
 #### Inference:
+
 1. Download and double click the DABC_Net.exe(Windows) or DABC_Mac(Mac OS) file. 
 You can run our network even without installing Tensorflow or Python interpreter on you computer. 
 The UI looks like this:
@@ -121,7 +121,6 @@ The UI looks like this:
 #### Uncertainty:
 
 In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.nips.cc/paper/8271-dropblock-a-regularization-method-for-convolutional-networks), a form of Monte Carlo dropout. For more details about aleatory and epistemic uncertainty, please refer to this [paper](https://pdfs.semanticscholar.org/146f/8844a380191a3f883c3584df3d7a6a56a999.pdf).
-
 
 1. Follow instructions from item(1-3) in the section above.
 
@@ -146,8 +145,6 @@ In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.
 Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 
 ![](fig/tool_visual.png)
-
-
 
 ## DABC-Net for Colab
 #### Inference:
@@ -182,7 +179,6 @@ infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleato
 - uncertainty:
    - Input: Choose uncertainty. The results will be saved as nii.gz format.
    - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
-   
 
 For more detail, please refer to [notebook](https://drive.google.com/).
 
@@ -269,7 +265,6 @@ Here are some examples:
 
 x-axis: time(day), y-axis: lesion ratio
 
-
 #####  Visualization of different timepoint scans
 
 ![](fig/progress_severe.png)
@@ -282,16 +277,11 @@ Dataset with Expert Annotations and Benchmark
 * [1] - Ma Jun, Ge Cheng, Wang Yixin, An Xingle, Gao Jiantao, … He Jian. (2020). COVID-19 CT Lung and Infection Segmentation Dataset (Version Verson 1.0) [Data set]. Zenodo. [DOI](https://zenodo.org/record/3757476)
 
 Data Sources
-* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [<link>](https://Coronacases.org) [Accessed 20 March 2020].
-* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia, Radiopaedia.Org. [online] Radiopaedia.org. Available at: [<link>](https://Radiopaedia.org) [Accessed 20 April 2020].
-
+* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! \| Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [<link>](https://Coronacases.org) [Accessed 20 March 2020].
+* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia \| Radiopaedia.Org. [online] Radiopaedia.org. Available at: [<link>](https://Radiopaedia.org) [Accessed 20 April 2020].
 
 # Notes
 
 Acknowledgements: We thank [COVID-19-CT-Seg-Benchmark repository](https://github.com/JunMa11/COVID-19-CT-Seg-Benchmark) for providing covid-19 segmentation dataset and benchmark. We also thank this [repository](https://github.com/EdwinZhang1970/Python/tree/master/tkinter-pack%20Demo) for providing us ideas for designing ui.
 
-
-
-
 Disclaimer: This toolkit is only for research purpose and not approved for clinical use.
-
