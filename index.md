@@ -14,6 +14,8 @@ This repository provide an implementation of DABC-Net (including graphical user 
 * Support for Covid-19 longitudinal study
 
 ## Table of Contents
+[test]:
+annotation
 * [Installation](#installation)
 * [Quick start](#Quick-start)
     + [DABC-Net for desktop app](#dabc-net_for-desktop-app)
@@ -24,12 +26,16 @@ This repository provide an implementation of DABC-Net (including graphical user 
     + [Usage](#Usage)   
     + [Visualization of progress](#Visualization-of-progress)
 * [Data](#Data)
-  
+* [Tutorial](#tutorial)    
 
 ## Installation
-If you run toolkit with packaged desktop app, you can skip this step.
+If you run toolkit with packaged destop app, you can skip this step.
 
-An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti GPU).
+[/DABC-Net is only tested on Windows. It may work on other operating systems as well but we do not guarantee that it will.
+/]:
+test
+
+An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
 Requirements:
 
@@ -48,6 +54,47 @@ You need to download this repository and run following command:
 cd path/to/repository/
 pip install -r requirement.txt
 ```
+The project folder looks like this:
+
+```
+path
+├─Input_data
+│      2020034797_0123_2949_20200123015940_4.nii.gz
+│      2020034797_0125_3052_20200125111145_4.nii.gz
+│      ...
+│
+├─Output_data
+│   │
+│   ├─covid
+│   │      2020034797_0123_2949_20200123015940_4.nii.gz
+│   │      2020034797_0125_3052_20200125111145_4.nii.gz
+│   │      ...
+│   │
+│   ├─lung
+│   │      2020034797_0123_2949_20200123015940_4.nii.gz
+│   │      2020034797_0125_3052_20200125111145_4.nii.gz
+│   │      ...
+│   │
+│   └─uncertainty
+│           2020034797_0123_2949_20200123015940_4_predictive_aleatoric.nii.gz
+│           2020034797_0125_3052_20200125111145_4_sample_1.nii.gz
+│           ...
+│
+├─weight
+│       model_05090017
+│       ...
+│
+│ (following folders are required if you need longitudinal study)
+│
+├─meta
+│       2020035021.csv
+│
+└─model
+        prediction.pkl
+        ...
+
+```
+
 
 ## Quick Start
 
@@ -57,7 +104,7 @@ pip install -r requirement.txt
 You can run our network even without installing Tensorflow or Python interpreter on you computer. 
 The UI looks like this:
 
-   ![Alt text](fig\fig1.png "fig.1")
+   ![Alt text](fig/fig1.png "fig.1")
 
 2. Type or select the input folder where you store nii/nii.gz format CT scans data. The output results will be saved in the folder you specified.
 
@@ -65,10 +112,10 @@ The UI looks like this:
 
 4. Click 'Run' button. After all the inference done, the progress bar window will be closed. 
    
-   ![fig.2](fig\fig2.png)   
+   ![fig.2](fig/fig2.png)   
    
    Here are some examples:
-   ![fig.4](fig\fig4.png )
+   ![fig.4](fig/fig4.png )
 
 #### Uncertainty:
 
@@ -83,32 +130,58 @@ In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.
 
 4. 'Method' denotes what kind of uncertainty you  want to save.
 
-   ![](fig\fig3.png)
+   ![](fig/fig3.png)
 
    Here are some examples:
 
-   ![](fig\fig5.png)
+   ![](fig/fig5.png)
+
+#### Visualization:
+
+* Raw: original CT scan
+* Lung: output of lung segmentation(optional)
+* Lesion: output of lesion segmentation
+
+Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
+
+![](fig/tool_visual.png)
+
+
 
 ## DABC-Net for Colab
 #### Inference:
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
-
-```python
-input_path = 'path/to/input_folder/'
-output_path = 'path/to/output_folder/
-
-infer_colab(input_path,output_path)
 ```
-
+infer_colab(input_path, output_path)
+```
+- nii_path : 
+    - Input: Folder path of input data(nii or nii.gz format).
+    - Type: string
+- save_path : Folder path of output data. The segmentation results will be saved as nii.gz format.
+    - Input: Folder path of input data(nii or nii.gz format).
+    - Type: string 
+- usage
+   - Input: Folder path of input data(nii or nii.gz format).
+   - Type: string, 'lung' or 'covid'
 #### Uncertainty:
-
-```python
-input_file_path = 'path/to/input_filename/'
-output_file_path = 'path/to/output_folder/'
-
-infer_uncertainty(input_file_path,output_file_path,sample_value=10,uc_chosen=Aleatoric)
 ```
+infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
+```
+- nii_filename : 
+    - Input: Path of input data(nii or nii.gz format).
+    - Type: string
+- save_filename :
+    - Input: Folder path of input data(nii or nii.gz format).
+    - Type: string 
+- sample_value
+   - Input: number of Monte carlo samples.
+   - Type: int
+- uncertainty:
+   - Input: Choose uncertainty. The results will be saved as nii.gz format.
+   - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
+   
+
 For more detail, please refer to [notebook](https://drive.google.com/).
 
 ##  DABC-Net for Website
@@ -186,20 +259,20 @@ Here are some examples:
 
 #### Progression curve of severe patient：
 
-![](fig\progress_curve_severe.png)
+![](fig/progress_curve_severe.png)
 
 #### Progression curve of mild patient：
 
-![](fig\progress_curve_mild.png)
+![](fig/progress_curve_mild.png)
 
-x-axis: time(day), y-axis: lesion ratio(%)
+x-axis: time(day), y-axis: lesion ratio
 
 
 #####  Visualization of different timepoint scans
 
-![](fig\progress_severe.png)
+![](fig/progress_severe.png)
 
-![](fig\progress_mild.png)
+![](fig/progress_mild.png)
 
 # Data
 
@@ -207,8 +280,9 @@ Dataset with Expert Annotations and Benchmark
 * [1] - Ma Jun, Ge Cheng, Wang Yixin, An Xingle, Gao Jiantao, … He Jian. (2020). COVID-19 CT Lung and Infection Segmentation Dataset (Version Verson 1.0) [Data set]. Zenodo. [DOI](https://zenodo.org/record/3757476)
 
 Data Sources
-* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries!  Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: <link> [Accessed 20 March 2020].
-* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia, Radiopaedia.Org. [online] Radiopaedia.org. Available at: <link> [Accessed 20 April 2020].
+* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! | Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [<link>](https://Coronacases.org) [Accessed 20 March 2020].
+* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia | Radiopaedia.Org. [online] Radiopaedia.org. Available at: [<link>](https://Radiopaedia.org) [Accessed 20 April 2020].
+
 
 # Notes
 
