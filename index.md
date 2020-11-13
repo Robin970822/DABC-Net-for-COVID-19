@@ -24,7 +24,7 @@ This repository provide an implementation of DABC-Net (including graphical user 
     + [Usage](#usage)   
     + [Visualization of progress](#visualization-of-progress)
 * [Data](#data)
-* [Tutorial](#tutorial)    
+* [Tutorial](#tutorial)
 
 ## Installation
 If you run toolkit with packaged destop app, you can skip this step.
@@ -93,7 +93,6 @@ path
 
 ### DABC-Net for desktop app
 #### Inference:
-
 1. Download and double click the DABC_Net.exe(Windows) or DABC_Mac(Mac OS) file. 
 You can run our network even without installing Tensorflow or Python interpreter on you computer. 
 The UI looks like this:
@@ -110,7 +109,6 @@ The UI looks like this:
    
    Here are some examples:
    ![fig.4](fig/fig4.png )
-
 
 #### Uncertainty:
 
@@ -172,7 +170,7 @@ infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleato
    - Type: int
 - uncertainty:
    - Input: Choose uncertainty. The results will be saved as nii.gz format.
-   - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
+   - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'   
 
 For more detail, please refer to [notebook](https://drive.google.com/).
 
@@ -185,34 +183,22 @@ coming soon
 ### Feature
 Feature we used:
 
-| Feature                    | Scan |
-| -------------------------  | ----------  |
-| Left lesion volume	     | scan0        |
-| Left lung volume	     | scan0        |
-| Left lesion ratio	     | scan0        |
-| Left consolidation volume  | scan0        |
-| Left weighted volume       | scan0        |
-| Left z-position            | scan0        |
-| Right lesion volume	     | scan0        |
-| Right lung volume	     | scan0        |
-| Right lesion ratio	     | scan0        |
-| Right consolidation volume | scan0        |
-| Right weighted volume      | scan0        |
-| Right z-position           | scan0        |
-| Left lesion volume	     | scan1        |
-| Left lung volume	     | scan1        |
-| Left lesion ratio	     | scan1        |
-| Left consolidation volume  | scan1        |
-| Left weighted volume       | scan1        |
-| Left z-position            | scan1        |
-| Right lesion volume	     | scan1        |
-| Right lung volume	     | scan1        |
-| Right lesion ratio	     | scan1        |
-| Right consolidation volume | scan1        |
-| Right weighted volume      | scan1        |
-| Right z-position           | scan1        |
-| Age		             | scan1        |
-| Sex		             | scan1        |
+| Feature                   | Scan |
+| ------------------------- | ------------ |
+| Left lesion volume        | scan0 & scan1|
+| Left lung volume          | scan0 & scan1|
+| Left lesion ratio         | scan0 & scan1|
+| Left consolidation volume | scan0 & scan1|
+| Left weighted volume      | scan0 & scan1|
+| Left z-position           | scan0 & scan1|
+| Right lesion volume       | scan0 & scan1|
+| Right lung volume         | scan0 & scan1|
+| Right lesion ratio        | scan0 & scan1|
+| Right consolidation volume| scan0 & scan1|
+| Right weighted volume     | scan0 & scan1|
+| Right z-position          | scan0 & scan1|
+| Age                       | scan0 & scan1|
+| Sex		                | scan0 & scan1|
 
 ### Base learner
 Base learners we used:
@@ -229,7 +215,7 @@ Base learners we used:
 |XGBoost		| False | True	|
 
 #### MinMaxScalar
-For base learners sensetive to data scale(svm, mlp, ...), we provide the min max scalar based on our training dataset. The weights without min max scalar (TODO) are also provided with fewer base learners and lower performance.
+For base learners sensitive to data normalization(svm, mlp, ...), we provide the min max normalization based on our training dataset. The weights without min max scalar (TODO) are also provided with fewer base learners and lower performance.
 
 ## Usage
 ### Prediction
