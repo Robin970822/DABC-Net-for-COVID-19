@@ -39,7 +39,7 @@ An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
 Requirements:
 
-* tensorflow-gpu == 1.15
+* tensorflow-gpu == 1.15.4
 * Keras == 2.2.4
 * numpy == 1.16
 * scikit-learn == 0.21.3
@@ -164,6 +164,7 @@ infer_colab(input_path, output_path)
 - usage
    - Input: Folder path of input data(nii or nii.gz format).
    - Type: string, 'lung' or 'covid'
+
 #### Uncertainty:
 ```
 infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
@@ -247,7 +248,7 @@ pred = predict_base_learners(base_learners, feature)
 - base_learners: 
    - Input: Trained base learners.
    - Type: dict, shape: {key: learner}, key: name of learner, learner: sklearn learner.
-- feature: tyep: 
+- feature: 
    - Input: Preprocessed features.
    - Type: array, shape: m x n, m: number of samples, n: number of features.
 - pred: 
@@ -280,8 +281,8 @@ Dataset with Expert Annotations and Benchmark
 * [1] - Ma Jun, Ge Cheng, Wang Yixin, An Xingle, Gao Jiantao, … He Jian. (2020). COVID-19 CT Lung and Infection Segmentation Dataset (Version Verson 1.0) [Data set]. Zenodo. [DOI](https://zenodo.org/record/3757476)
 
 Data Sources
-* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! | Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [<link>](https://Coronacases.org) [Accessed 20 March 2020].
-* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia | Radiopaedia.Org. [online] Radiopaedia.org. Available at: [<link>](https://Radiopaedia.org) [Accessed 20 April 2020].
+* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! \| Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [<link>](https://Coronacases.org) [Accessed 20 March 2020].
+* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia \| Radiopaedia.Org. [online] Radiopaedia.org. Available at: [<link>](https://Radiopaedia.org) [Accessed 20 April 2020].
 
 
 # Notes

@@ -8,6 +8,7 @@ Original file is located at
 """
 
 import os
+
 # from google.colab import drive
 # drive.mount('/content/drive')
 
@@ -20,15 +21,18 @@ import os
 import numpy as np
 
 import tensorflow as tf
+
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 from read_all_data_from_nii_pipe import read_from_nii
 
-import tensorflow as tf  
+import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 set_session(tf.Session(config=config))
+
 
 def infer_colab(nii_path='', save_path='', sform_code=0, usage='covid'):
     save_path = save_path + '/*'
@@ -70,36 +74,37 @@ def infer_colab(nii_path='', save_path='', sform_code=0, usage='covid'):
         return None
 
     model = Model.DABC(input_size=(4, 256, 256, 1),
-                          load_weighted=name)
-
+                       load_weighted=name)
 
     pred = local_evaluate(test_vol, test_mask, model, model_name_id=None, only_infer=True, )
-
 
     from read_all_data_from_nii_pipe import save_pred_to_nii
 
     save_pred_to_nii(pred=pred, save_path=save_path.replace('*', ''), ref_path=nii_path,
                      need_resize=True, need_rotate=True)
 
+
 # Segment lesions
 # input='input'
 # output='output'
-input_path='2020035365'
-output_path='2020035365_output/covid'
-infer_colab(input_path,output_path)
-
+input_path = '2020035365'
+output_path = '2020035365_output/covid'
+infer_colab(input_path, output_path)
 
 # Segment lung
 # output='output_lung'
-output_path='2020035365_output/lung'
-infer_colab(input_path,output_path,usage='lung')
+output_path = '2020035365_output/lung'
+infer_colab(input_path, output_path, usage='lung')
 
 from postprocess_lung import remove_small_objects
+
 # remove_small_objects('output_lung')  # (This step is optional.)
 remove_small_objects('2020035365_output/lung')
 
 from infer_uncertainty_colab import infer_uncertainty
-infer_uncertainty('2020035365/2020035365_0204_3050_20200204184413_4.nii.gz','2020035365_output/uncertainty',sample_value=5,uc_chosen='Both')
+
+infer_uncertainty('2020035365/2020035365_0204_3050_20200204184413_4.nii.gz', '2020035365_output/uncertainty',
+                  sample_value=5, uc_chosen='Both')
 
 """## Visualisation
 
@@ -116,13 +121,14 @@ from warnings import warn
 
 
 def montage_nd(in_img):
-    if len(in_img.shape)>3:
-        return montage(np.stack([montage_nd(x_slice) for x_slice in in_img],0))
-    elif len(in_img.shape)==3:
+    if len(in_img.shape) > 3:
+        return montage(np.stack([montage_nd(x_slice) for x_slice in in_img], 0))
+    elif len(in_img.shape) == 3:
         return montage(in_img)
     else:
         warn('Dimension of input less than 3, returning original', RuntimeWarning)
         return in_img
+
 
 input_path = '2020035365'
 output_lung_path = '2020035365_output/lung'
@@ -138,7 +144,7 @@ for nii_index in range(len(glob(input_path + '/*'))):
     for i in range(vol_slice.shape[0]):
         vol_slice[i] = cv2.flip(vol_slice[i], 0)
     vol.append(vol_slice)
-vol = np.array(vol)  
+vol = np.array(vol)
 vol = np.expand_dims(vol, -1)
 
 vol_lung = []
@@ -148,7 +154,7 @@ for nii_index in range(len(glob(output_lung_path + '/*'))):
     for i in range(vol_slice.shape[0]):
         vol_slice[i] = cv2.flip(vol_slice[i], 0)
     vol_lung.append(vol_slice)
-vol_lung = np.array(vol_lung) 
+vol_lung = np.array(vol_lung)
 vol_lung = np.expand_dims(vol_lung, -1)
 
 vol_covid = []
@@ -158,7 +164,7 @@ for nii_index in range(len(glob(output_covid_path + '/*'))):
     for i in range(vol_slice.shape[0]):
         vol_slice[i] = cv2.flip(vol_slice[i], 0)
     vol_covid.append(vol_slice)
-vol_covid = np.array(vol_covid) 
+vol_covid = np.array(vol_covid)
 vol_covid = np.expand_dims(vol_covid, -1)
 
 import matplotlib.pyplot as plt
@@ -171,7 +177,7 @@ fig, (ax1, ax2, ax3) = plt.subplots(1, 3,
 # print('vol_lung.shape:',vol_lung.shape)
 # print('vol_covid.shape:',vol_covid.shape)
 
-ax1.imshow(montage_nd(vol[..., 0]), cmap='gray')  
+ax1.imshow(montage_nd(vol[..., 0]), cmap='gray')
 ax1.set_title('Raw')
 ax2.imshow(montage_nd(vol_lung[..., 0]), cmap='gray')
 ax2.set_title('Lung')
@@ -189,26 +195,29 @@ import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
 
-def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz',slice_id=175,sform_code=1):
+
+def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', slice_id=175, sform_code=1):
     # name_id = '2020035365_0204_3050_20200204184413_4.nii.gz'
     # sform_code=1
 
     # slice_id = 175
 
-    rawimg = nib.load(r'2020035365/'+name_id).get_fdata()
-    aleatoric = nib.load(r'2020035365_output/uncertainty/'+'aleatoric_'+name_id).get_fdata()  
-    epistemic = nib.load(r'2020035365_output/uncertainty/'+'epistemic_'+name_id).get_fdata()
+    rawimg = nib.load(r'2020035365/' + name_id).get_fdata()
+    aleatoric = nib.load(r'2020035365_output/uncertainty/' + 'aleatoric_' + name_id).get_fdata()
+    epistemic = nib.load(r'2020035365_output/uncertainty/' + 'epistemic_' + name_id).get_fdata()
 
-    slices_num=rawimg.shape[-1]
+    slices_num = rawimg.shape[-1]
 
-    our = nib.load(r'2020035365_output/covid/'+name_id).get_fdata()
+    our = nib.load(r'2020035365_output/covid/' + name_id).get_fdata()
 
-    our = our[:,:,slice_id]
+    our = our[:, :, slice_id]
 
-    rawimg = rawimg[:,:,slice_id]; rawimg[rawimg<-1024]=-1024; rawimg[rawimg>255]=255 
+    rawimg = rawimg[:, :, slice_id];
+    rawimg[rawimg < -1024] = -1024;
+    rawimg[rawimg > 255] = 255
     # gt = gt[:,:,slice_id]
-    aleatoric = aleatoric[:,:,slice_id]
-    epistemic = epistemic[:,:,slice_id]
+    aleatoric = aleatoric[:, :, slice_id]
+    epistemic = epistemic[:, :, slice_id]
 
     # sform_code==1:rot90,1. else:rot90,-1
     if sform_code:
@@ -220,16 +229,18 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz',slic
     else:
         rotate = -1
         import cv2
-        aleatoric = np.rot90(aleatoric, rotate); aleatoric = cv2.flip(aleatoric, 1)
-        epistemic = np.rot90(epistemic, rotate); epistemic = cv2.flip(epistemic, 1)
-        rawimg = np.rot90(rawimg, rotate); rawimg = cv2.flip(rawimg, 1)
-        our = np.rot90(our, rotate); our = cv2.flip(our, 1)
-
+        aleatoric = np.rot90(aleatoric, rotate);
+        aleatoric = cv2.flip(aleatoric, 1)
+        epistemic = np.rot90(epistemic, rotate);
+        epistemic = cv2.flip(epistemic, 1)
+        rawimg = np.rot90(rawimg, rotate);
+        rawimg = cv2.flip(rawimg, 1)
+        our = np.rot90(our, rotate);
+        our = cv2.flip(our, 1)
 
     from transparent_imshow import transp_imshow
 
-
-    def overlay(_src, _pred, _gt, need_crop = True, add_text=False, need_save=False,
+    def overlay(_src, _pred, _gt, need_crop=True, add_text=False, need_save=False,
                 need_overlay=True, need_overlay_alea=None, need_overlay_epis=False, aleatoric=None, epistemic=None,
                 need_overlay_alea_scale=False):
         # need_save:'img_File_name'
@@ -239,37 +250,36 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz',slic
 
         if need_crop:  # (row1,row2,c1,c2)
             if 'cor' in need_save:
-                need_crop=(30,350,20,-20)
-                rawimg=rawimg[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
-                prediction= prediction[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
-                gt=gt[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
+                need_crop = (30, 350, 20, -20)
+                rawimg = rawimg[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
+                prediction = prediction[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
+                gt = gt[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
             if 'radio' in need_save:
-
-                need_crop = (90,570,0,-1)  
+                need_crop = (90, 570, 0, -1)
                 rawimg = rawimg[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 prediction = prediction[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 gt = gt[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
 
-        plt.imshow(rawimg, cmap='gray', )  
+        plt.imshow(rawimg, cmap='gray', )
         if need_overlay:
             TP = prediction * gt
             FP = prediction * (np.ones_like(gt) - gt)
             FN = (1 - prediction) * gt
-            transp_imshow(TP, cmap='RdYlGn', alpha=0.7) 
+            transp_imshow(TP, cmap='RdYlGn', alpha=0.7)
             transp_imshow(FP, cmap='cool', alpha=0.7)  #
             transp_imshow(FN, cmap='Wistia', alpha=0.7)
         if need_overlay_epis:
-            if need_crop:  
+            if need_crop:
                 epistemic = epistemic[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
             plt.imshow(rawimg, cmap='gray', )
-            transp_imshow(epistemic, cmap='autumn_r', alpha=1.0) 
+            transp_imshow(epistemic, cmap='autumn_r', alpha=1.0)
         if need_overlay_alea:
             if need_crop:
                 aleatoric = aleatoric[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
             plt.imshow(rawimg, cmap='gray', )
 
-    #         print(need_overlay_alea)
-    #         print('vmin: ',0.5)
+            #         print(need_overlay_alea)
+            #         print('vmin: ',0.5)
             transp_imshow(aleatoric, cmap='winter',
 
                           )
@@ -282,36 +292,40 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz',slic
                     'color': 'red',
                     'size': 20
                     }
-            plt.text(5, -5, s='Dice: ' + str(_dice), color='black',  
+            plt.text(5, -5, s='Dice: ' + str(_dice), color='black',
                      # horizontalalignment='right',
                      # verticalalignment='top',
                      fontdict=font,
                      )
-        plt.axis('off') 
+        plt.axis('off')
         # plt.xticks([])  
         # plt.yticks([])
         if need_save:  # False or file string
-            plt.gca().xaxis.set_major_locator(plt.NullLocator()) 
+            plt.gca().xaxis.set_major_locator(plt.NullLocator())
             plt.gca().yaxis.set_major_locator(plt.NullLocator())
 
             plt.savefig(need_save,
-                        bbox_inches='tight',  
-                        dpi=300,pad_inches=0.0) 
+                        bbox_inches='tight',
+                        dpi=300, pad_inches=0.0)
         plt.show()
 
-    print('Slice: {0}/{1}'.format(slice_id,slices_num))
+    print('Slice: {0}/{1}'.format(slice_id, slices_num))
     print('Raw image:')
-    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False,need_overlay=False, add_text=False, need_save='2020035365_output/'+name_id+str(slice_id)+'_src_.png')
+    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False, add_text=False,
+            need_save='2020035365_output/' + name_id + str(slice_id) + '_src_.png')
     print('Aleatoric uncertainty:')
-    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False, aleatoric=aleatoric,need_overlay_alea=True, add_text=False, need_save='2020035365_output/'+name_id+str(slice_id)+'_Uc_alea_.png')
+    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
+            aleatoric=aleatoric, need_overlay_alea=True, add_text=False,
+            need_save='2020035365_output/' + name_id + str(slice_id) + '_Uc_alea_.png')
     print('Epistemic uncertainty:')
-    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False, epistemic=epistemic,need_overlay_epis=True, add_text=False, need_save='2020035365_output/'+name_id+str(slice_id)+'_Uc_epis_.png')
-
-plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz',slice_id=175)
-
-plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz',slice_id=150)
+    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
+            epistemic=epistemic, need_overlay_epis=True, add_text=False,
+            need_save='2020035365_output/' + name_id + str(slice_id) + '_Uc_epis_.png')
 
 
+plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', slice_id=175)
+
+plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', slice_id=150)
 
 """#Early triage of critically ill
 
@@ -325,7 +339,7 @@ from read_all_data_from_nii_pipe import read_from_nii
 import pandas as pd
 
 # severe patient
-meta_path='meta/2020035365.csv'
+meta_path = 'meta/2020035365.csv'
 meta = pd.read_csv(meta_path, index_col=[0])
 
 raw_data = read_from_nii(r'2020035365/*').astype('float32')  # (3201, 256, 256)  0-1
@@ -333,7 +347,7 @@ lung = read_from_nii(r'2020035365_output/lung/*').astype('float32')  # (3201, 25
 lesion = read_from_nii(r'2020035365_output/covid/*').astype('float32')  # (3201, 256, 256)
 
 # mild patient
-meta_path_mild='meta/2020035021.csv'
+meta_path_mild = 'meta/2020035021.csv'
 meta_mild = pd.read_csv(meta_path_mild, index_col=[0])
 
 import os
@@ -481,7 +495,7 @@ def get_consolidation(raw_data, lung, lesion, thres=0.5):
         lung_lesion_union_close, cv2.MORPH_CLOSE, kernel)
 
     lung_lesion_union_open_area = raw_data * \
-        lung_lesion_union_open[:raw_data.shape[0]]
+                                  lung_lesion_union_open[:raw_data.shape[0]]
 
     _, thres_image = cv2.threshold(
         lung_lesion_union_open_area, thres, 1, cv2.THRESH_BINARY)
@@ -598,11 +612,12 @@ def predict_base_learners(base_learners, x):
     P = np.zeros((x.shape[0], len(base_learners)))
     print('Generating base learner predictions.')
     for i, (name, m) in enumerate(base_learners.items()):
-        print('%s...'% name, end='', flush=False)
+        print('%s...' % name, end='', flush=False)
         p = m.predict_proba(x)
         P[:, i] = p[:, 1]
     print('done.')
     return P
+
 
 """## Visualization
 
@@ -620,17 +635,19 @@ plt.imshow(lesion[num], cmap='bone')
 
 """## Calculate"""
 
-def calculate(raw_data,lung,lesion,meta, patientID):
-  meta = meta[meta['slice'] > 300]  # select thin scans
-  meta = meta.reset_index()  # DataFrame index reset
 
-  # patientID = '2020035365'
+def calculate(raw_data, lung, lesion, meta, patientID):
+    meta = meta[meta['slice'] > 300]  # select thin scans
+    meta = meta.reset_index()  # DataFrame index reset
 
-  res_list = calculate_volume(raw_data, lung, lesion, meta, crop=[0.17, 0.08])
-  all_info = pd.concat([meta, pd.DataFrame(res_list)], axis=1)
-  return res_list,all_info
+    # patientID = '2020035365'
 
-res_list, all_info = calculate(raw_data,lung,lesion, meta, patientID=2020035365)
+    res_list = calculate_volume(raw_data, lung, lesion, meta, crop=[0.17, 0.08])
+    all_info = pd.concat([meta, pd.DataFrame(res_list)], axis=1)
+    return res_list, all_info
+
+
+res_list, all_info = calculate(raw_data, lung, lesion, meta, patientID=2020035365)
 
 del raw_data, lung, lesion
 
@@ -644,22 +661,26 @@ del raw_data_mild, lung_mild, lesion_mild
 
 """## Multi-time Visualization"""
 
-def Multi_timepoint_Visualization(all_info,patientID,):
-  all_info['date'] = (pd.to_datetime(all_info['StudyDate']) - pd.to_datetime(all_info['StudyDate']).iloc[0]).map(get_days)
 
-  colors = [sns.color_palette('Greens')[2], sns.color_palette('Reds')[4]]
-  point_colors = [sns.color_palette('Greens')[3], sns.color_palette('Reds')[5]]
+def Multi_timepoint_Visualization(all_info, patientID, ):
+    all_info['date'] = (pd.to_datetime(all_info['StudyDate']) - pd.to_datetime(all_info['StudyDate']).iloc[0]).map(
+        get_days)
 
-  plt.plot(all_info['date'], all_info['ratio'], color=point_colors[1], linestyle='-', label='{}: Lesion'.format(patientID), alpha=0.4)
-  mild_info = all_info[all_info['Severe'] == 0]
-  plt.scatter(mild_info['date'], mild_info['ratio'], color=colors[0], marker='o', s=100, alpha=1.0)
-  severe_info = all_info[all_info['Severe'] > 0]
-  plt.scatter(severe_info['date'], severe_info['ratio'], color=colors[1], marker='^', s=100, alpha=1.0)
+    colors = [sns.color_palette('Greens')[2], sns.color_palette('Reds')[4]]
+    point_colors = [sns.color_palette('Greens')[3], sns.color_palette('Reds')[5]]
+
+    plt.plot(all_info['date'], all_info['ratio'], color=point_colors[1], linestyle='-',
+             label='{}: Lesion'.format(patientID), alpha=0.4)
+    mild_info = all_info[all_info['Severe'] == 0]
+    plt.scatter(mild_info['date'], mild_info['ratio'], color=colors[0], marker='o', s=100, alpha=1.0)
+    severe_info = all_info[all_info['Severe'] > 0]
+    plt.scatter(severe_info['date'], severe_info['ratio'], color=colors[1], marker='^', s=100, alpha=1.0)
+
 
 print('Severe pateint vs Mild pateint')
-Multi_timepoint_Visualization(all_info,patientID=2020035365)
+Multi_timepoint_Visualization(all_info, patientID=2020035365)
 plt.figure()
-Multi_timepoint_Visualization(all_info_mild,patientID=2020035021)
+Multi_timepoint_Visualization(all_info_mild, patientID=2020035021)
 
 """## Prediction
 ### Load model
@@ -692,55 +713,61 @@ feature = [
 
 """## Preprocessing"""
 
+
 # Preprocessing
 
 def Preprocessing(all_info):
-  # transfer PatientSex into 0/1
-  all_info['sex'] = all_info['PatientSex'].map(get_sex)
-  # normalize the z-position by dividing the slice number of the CT scan
-  all_info['z'] = all_info['z'] / all_info['slice']
-  all_info['left_z'] = all_info['left_z'] / all_info['slice']
-  all_info['right_z'] = all_info['right_z'] / all_info['slice']
+    # transfer PatientSex into 0/1
+    all_info['sex'] = all_info['PatientSex'].map(get_sex)
+    # normalize the z-position by dividing the slice number of the CT scan
+    all_info['z'] = all_info['z'] / all_info['slice']
+    all_info['left_z'] = all_info['left_z'] / all_info['slice']
+    all_info['right_z'] = all_info['right_z'] / all_info['slice']
 
-  X = all_info[feature].astype(np.float32)
-  return X
+    X = all_info[feature].astype(np.float32)
+    return X
+
 
 X = Preprocessing(all_info)
 X_mild = Preprocessing(all_info_mild)
 
 """## Per Scan Classification"""
 
+
 def Per_Scan_Classification(X):
-  x = min_max_scalar(np.array(X), np.array(min_max_dict_cls['min']), np.array(min_max_dict_cls['max']))
-  P_pred = predict_base_learners(base_cls, np.array(x))
-  p = P_pred.mean(axis=1)
-  return p
+    x = min_max_scalar(np.array(X), np.array(min_max_dict_cls['min']), np.array(min_max_dict_cls['max']))
+    P_pred = predict_base_learners(base_cls, np.array(x))
+    p = P_pred.mean(axis=1)
+    return p
+
 
 p = Per_Scan_Classification(X)
 print('Prediction of severe patient(per scan):\n{}\n'.format(p))
 p_mild = Per_Scan_Classification(X_mild)
 print('Prediction of mild patient(per scan):\n{}\n'.format(p_mild))
 
-print('\n'+'*'*10+'\tSevere patient\t'+'*'*10)
+print('\n' + '*' * 10 + '\tSevere patient\t' + '*' * 10)
 print('pred\t{} \ngt\t{} \nprob {}'.format((p > 0.5).astype('int'), np.array(all_info['Severe']), p))
-print('\n'+'*'*10+'\tMild patient\t'+'*'*10)
+print('\n' + '*' * 10 + '\tMild patient\t' + '*' * 10)
 print('pred\t{} \ngt\t{} \nprob {}'.format((p_mild > 0.5).astype('int'), np.array(all_info_mild['Severe']), p_mild))
 
 """## First Two Scans"""
 
+
 def First_Two_Scans(X):
-  # first two scan
-  x_list = X.iloc[1].tolist()[:-2] + X.iloc[0].tolist()
-  # min max scale
-  x = min_max_scalar(np.array(x_list), np.array(min_max_dict_pred['min']), np.array(min_max_dict_pred['max']))
+    # first two scan
+    x_list = X.iloc[1].tolist()[:-2] + X.iloc[0].tolist()
+    # min max scale
+    x = min_max_scalar(np.array(x_list), np.array(min_max_dict_pred['min']), np.array(min_max_dict_pred['max']))
 
-  # Predition
-  P_pred = predict_base_learners(base_pred, np.array([x]))
-  return P_pred.mean()
+    # Predition
+    P_pred = predict_base_learners(base_pred, np.array([x]))
+    return P_pred.mean()
 
-print('\n'+'*'*10+'\tSevere patient\t'+'*'*10)
+
+print('\n' + '*' * 10 + '\tSevere patient\t' + '*' * 10)
 print(First_Two_Scans(X))
-print('\n'+'*'*10+'\tMild patient\t'+'*'*10)
+print('\n' + '*' * 10 + '\tMild patient\t' + '*' * 10)
 print(First_Two_Scans(X_mild))
 
 """# Comparison
@@ -758,55 +785,55 @@ import matplotlib.pyplot as plt
 
 
 def montage_nd(in_img):
-    if len(in_img.shape)>3:
-        return montage(np.stack([montage_nd(x_slice) for x_slice in in_img],0))
-    elif len(in_img.shape)==3:
+    if len(in_img.shape) > 3:
+        return montage(np.stack([montage_nd(x_slice) for x_slice in in_img], 0))
+    elif len(in_img.shape) == 3:
         return montage(in_img)
     else:
         warn('Dimension of input less than 3, returning original', RuntimeWarning)
         return in_img
 
 
-def plot_Comparison(input_path,output_lung_path,output_covid_path,slice_count,timepoint_count,save_result=False):
-  vol = np.zeros((timepoint_count,slice_count,512,512,1))
-  for nii_index in range(len(glob(input_path + '/*nii*'))):
-      volume = get_itk_array(glob(input_path + '/*nii*')[nii_index])
-      vol_slice = volume[slice_id[nii_index]:(slice_id[nii_index] + slice_count)]
-      for i in range(vol_slice.shape[0]):
-          vol_slice[i] = cv2.flip(vol_slice[i], 0)
-      vol[nii_index]=np.expand_dims(vol_slice,-1)
+def plot_Comparison(input_path, output_lung_path, output_covid_path, slice_count, timepoint_count, save_result=False):
+    vol = np.zeros((timepoint_count, slice_count, 512, 512, 1))
+    for nii_index in range(len(glob(input_path + '/*nii*'))):
+        volume = get_itk_array(glob(input_path + '/*nii*')[nii_index])
+        vol_slice = volume[slice_id[nii_index]:(slice_id[nii_index] + slice_count)]
+        for i in range(vol_slice.shape[0]):
+            vol_slice[i] = cv2.flip(vol_slice[i], 0)
+        vol[nii_index] = np.expand_dims(vol_slice, -1)
 
-  vol_lung = np.zeros((timepoint_count,slice_count,512,512,1))
-  for nii_index in range(len(glob(output_lung_path + '/*'))):
-      volume = get_itk_array(glob(output_lung_path + '/*')[nii_index])
-      vol_slice = volume[slice_id[nii_index]:(slice_id[nii_index] + slice_count)]
-      for i in range(vol_slice.shape[0]):
-          vol_slice[i] = cv2.flip(vol_slice[i], 0)
-      vol_lung[nii_index]=np.expand_dims(vol_slice,-1)
+    vol_lung = np.zeros((timepoint_count, slice_count, 512, 512, 1))
+    for nii_index in range(len(glob(output_lung_path + '/*'))):
+        volume = get_itk_array(glob(output_lung_path + '/*')[nii_index])
+        vol_slice = volume[slice_id[nii_index]:(slice_id[nii_index] + slice_count)]
+        for i in range(vol_slice.shape[0]):
+            vol_slice[i] = cv2.flip(vol_slice[i], 0)
+        vol_lung[nii_index] = np.expand_dims(vol_slice, -1)
 
+    vol_covid = np.zeros((timepoint_count, slice_count, 512, 512, 1))  # (timepoint, slices num for each scan, H, W, 1)
+    for nii_index in range(len(glob(output_covid_path + '/*'))):
+        volume = get_itk_array(glob(output_covid_path + '/*')[nii_index])
+        vol_slice = volume[slice_id[nii_index]:(slice_id[nii_index] + slice_count)]
+        for i in range(vol_slice.shape[0]):
+            vol_slice[i] = cv2.flip(vol_slice[i], 0)
+        vol_covid[nii_index] = np.expand_dims(vol_slice, -1)
 
-  vol_covid = np.zeros((timepoint_count,slice_count,512,512,1))  # (timepoint, slices num for each scan, H, W, 1)
-  for nii_index in range(len(glob(output_covid_path + '/*'))):
-      volume = get_itk_array(glob(output_covid_path + '/*')[nii_index])
-      vol_slice = volume[slice_id[nii_index]:(slice_id[nii_index] + slice_count)]
-      for i in range(vol_slice.shape[0]):
-          vol_slice[i] = cv2.flip(vol_slice[i], 0)
-      vol_covid[nii_index]=np.expand_dims(vol_slice,-1)
+    # plot
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3,
+                                        figsize=(30, 10)
+                                        )
 
-  # plot
-  fig, (ax1, ax2, ax3) = plt.subplots(1, 3,
-                                      figsize=(30, 10)
-                                      )
+    ax1.imshow(montage_nd(vol[..., 0]), cmap='gray')
+    ax1.set_title('Raw')
+    ax2.imshow(montage_nd(vol_lung[..., 0]), cmap='gray')
+    ax2.set_title('Lung')
+    ax3.imshow(montage_nd(vol_covid[..., 0]), cmap='gray')
+    ax3.set_title('Lesions')
 
-  ax1.imshow(montage_nd(vol[..., 0]), cmap='gray')
-  ax1.set_title('Raw')
-  ax2.imshow(montage_nd(vol_lung[..., 0]), cmap='gray')
-  ax2.set_title('Lung')
-  ax3.imshow(montage_nd(vol_covid[..., 0]), cmap='gray')
-  ax3.set_title('Lesions')
+    if save_result:
+        plt.savefig('results.png')
 
-  if save_result:
-    plt.savefig('results.png')
 
 input_path = '2020035365'
 output_lung_path = '2020035365_output/lung'
@@ -814,26 +841,30 @@ output_covid_path = '2020035365_output/covid'
 
 slice_id = [175, 162, 195, 195, 195, 195, 195, 195]
 slice_count = 1  # slice number to plot for each scan.
-plot_Comparison(input_path,output_lung_path,output_covid_path,1,8)
+plot_Comparison(input_path, output_lung_path, output_covid_path, 1, 8)
 
 input_path = '2020035021'
 output_lung_path = '2020035021_output/lung'
 output_covid_path = '2020035021_output/covid'
 slice_id = [200, 200, 200, 200, 200, 200]
-plot_Comparison(input_path,output_lung_path,output_covid_path,1,6)
+plot_Comparison(input_path, output_lung_path, output_covid_path, 1, 6)
+
 
 def plot_Progress_curve(all_info, patientID):
-  plt.figure()
-  all_info['date'] = (pd.to_datetime(all_info['StudyDate']) - pd.to_datetime(all_info['StudyDate']).iloc[0]).map(get_days)
+    plt.figure()
+    all_info['date'] = (pd.to_datetime(all_info['StudyDate']) - pd.to_datetime(all_info['StudyDate']).iloc[0]).map(
+        get_days)
 
-  colors = [sns.color_palette('Greens')[2], sns.color_palette('Reds')[4]]
-  point_colors = [sns.color_palette('Greens')[3], sns.color_palette('Reds')[5]]
+    colors = [sns.color_palette('Greens')[2], sns.color_palette('Reds')[4]]
+    point_colors = [sns.color_palette('Greens')[3], sns.color_palette('Reds')[5]]
 
-  plt.plot(all_info['date'], all_info['ratio'], color=point_colors[1], linestyle='-', label='{}: Lesion'.format(patientID), alpha=0.4)
-  mild_info = all_info[all_info['Severe'] == 0]
-  plt.scatter(mild_info['date'], mild_info['ratio'], color=colors[0], marker='o', s=100, alpha=1.0)
-  severe_info = all_info[all_info['Severe'] > 0]
-  plt.scatter(severe_info['date'], severe_info['ratio'], color=colors[1], marker='^', s=100, alpha=1.0)
+    plt.plot(all_info['date'], all_info['ratio'], color=point_colors[1], linestyle='-',
+             label='{}: Lesion'.format(patientID), alpha=0.4)
+    mild_info = all_info[all_info['Severe'] == 0]
+    plt.scatter(mild_info['date'], mild_info['ratio'], color=colors[0], marker='o', s=100, alpha=1.0)
+    severe_info = all_info[all_info['Severe'] > 0]
+    plt.scatter(severe_info['date'], severe_info['ratio'], color=colors[1], marker='^', s=100, alpha=1.0)
+
 
 plot_Progress_curve(all_info, patientID=2020035365)
 plot_Progress_curve(all_info_mild, patientID=2020035021)
@@ -844,55 +875,57 @@ from transparent_imshow import transp_imshow
 from glob import glob
 from utils_mri import get_itk_array
 
-def data_Progress_of_disease(all_info,patientID,timepoint_count):
-  gt = np.array(all_info['Severe'])
 
-  raw_list = glob(r'{}/*nii*'.format(patientID))
-  lung_list = glob(r'{}_output/lung/*'.format(patientID))
-  covid_list = glob(r'{}_output/covid/*'.format(patientID))
+def data_Progress_of_disease(all_info, patientID, timepoint_count):
+    gt = np.array(all_info['Severe'])
 
-  raw = np.zeros((timepoint_count, 512, 512))
-  lesion = np.zeros((timepoint_count,512,512))
+    raw_list = glob(r'{}/*nii*'.format(patientID))
+    lung_list = glob(r'{}_output/lung/*'.format(patientID))
+    covid_list = glob(r'{}_output/covid/*'.format(patientID))
 
-  for i,name in enumerate(raw_list):
-      raw[i] = np.flip(get_itk_array(name).astype('float32')[slice_id[i]], axis=0)
-  raw[raw<-1024] = -1024
-  raw[raw>512] = 512
+    raw = np.zeros((timepoint_count, 512, 512))
+    lesion = np.zeros((timepoint_count, 512, 512))
 
-  for i,name in enumerate(covid_list):
-      lesion[i] = np.flip(get_itk_array(name).astype('float32')[slice_id[i]], axis=0)
-  
-  return raw,lesion,gt
+    for i, name in enumerate(raw_list):
+        raw[i] = np.flip(get_itk_array(name).astype('float32')[slice_id[i]], axis=0)
+    raw[raw < -1024] = -1024
+    raw[raw > 512] = 512
 
-def plot_progress(raw, lesion, gt, color_map='Reds', state = 'severe', timepoint_count=8
-                ):
+    for i, name in enumerate(covid_list):
+        lesion[i] = np.flip(get_itk_array(name).astype('float32')[slice_id[i]], axis=0)
+
+    return raw, lesion, gt
+
+
+def plot_progress(raw, lesion, gt, color_map='Reds', state='severe', timepoint_count=8
+                  ):
     fig = plt.figure(figsize=(30, 9))
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, i+1)
+        plt.subplot(2, timepoint_count, i + 1)
         plt.imshow(raw[i], cmap='gray')
-        plt.title('No.{} scan\n'.format(i+1), fontsize=16)
+        plt.title('No.{} scan\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, timepoint_count+i+1)
+        plt.subplot(2, timepoint_count, timepoint_count + i + 1)
         plt.imshow(raw[i], cmap='gray')
         # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
         transp_imshow(lesion[i], cmap=color_map, alpha=0.7)
-        plt.title('Prediction:{}\nGround Truth:{}'.format(round(p[i],3), round(gt[i],3)), fontsize=16)
+        plt.title('Prediction:{}\nGround Truth:{}'.format(round(p[i], 3), round(gt[i], 3)), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     fig.suptitle('Progress of {} patient in longitudinal study'.format(state), fontsize=26)
     plt.show()
 
+
 slice_id = [175, 162, 195, 195, 195, 195, 195, 195]
-raw,lesion,gt = data_Progress_of_disease(all_info, patientID=2020035365,timepoint_count=8)
+raw, lesion, gt = data_Progress_of_disease(all_info, patientID=2020035365, timepoint_count=8)
 plot_progress(raw, lesion, gt, state='severe', color_map='Reds', timepoint_count=8)
 
 print('\n\n')
 slice_id = [200, 200, 200, 200, 200, 200]
-raw,lesion,gt = data_Progress_of_disease(all_info_mild, patientID=2020035021,timepoint_count=6)
-plot_progress(raw, lesion, gt, state='mild', color_map='Reds',timepoint_count=6)
+raw, lesion, gt = data_Progress_of_disease(all_info_mild, patientID=2020035021, timepoint_count=6)
+plot_progress(raw, lesion, gt, state='mild', color_map='Reds', timepoint_count=6)
 
 """Predict the patient condiction using each CT scan."""
-

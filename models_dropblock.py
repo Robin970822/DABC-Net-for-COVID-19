@@ -24,6 +24,7 @@ class DropBlock2D(tf.keras.layers.Layer):
     """
     [1] Ghiasi G, Lin T Y, Le Q V. Dropblock: A regularization method for convolutional networks[C]//Advances in Neural Information Processing Systems. 2018: 10727-10737.
     """
+
     def __init__(self, keep_prob, block_size, scale=True, **kwargs):
         super(DropBlock2D, self).__init__(**kwargs)
         self.keep_prob = float(keep_prob) if isinstance(keep_prob, int) else keep_prob
@@ -68,9 +69,9 @@ class DropBlock2D(tf.keras.layers.Layer):
 
     def _create_mask(self, input_shape):
         sampling_mask_shape = tf.stack([input_shape[0],
-                                       self.h - self.block_size + 1,
-                                       self.w - self.block_size + 1,
-                                       self.channel])
+                                        self.h - self.block_size + 1,
+                                        self.w - self.block_size + 1,
+                                        self.channel])
         mask = _bernoulli(sampling_mask_shape, self.gamma)
         mask = tf.pad(mask, self.padding)
         mask = tf.nn.max_pool(mask, [1, self.block_size, self.block_size, 1], [1, 1, 1, 1], 'SAME')
@@ -92,7 +93,7 @@ class DropBlock3D(tf.keras.layers.Layer):
         assert len(input_shape) == 5
         _, self.d, self.h, self.w, self.channel = input_shape.as_list()
         p1 = (self.block_size - 1) // 2
-        p0= (self.block_size - 1) - p1
+        p0 = (self.block_size - 1) - p1
         self.padding = [[0, 0], [p0, p1], [p0, p1], [p0, p1], [0, 0]]
         self.set_keep_prob()
         super(DropBlock3D, self).build(input_shape)
@@ -129,7 +130,8 @@ class DropBlock3D(tf.keras.layers.Layer):
                                         self.channel])
         mask = _bernoulli(sampling_mask_shape, self.gamma)
         mask = tf.pad(mask, self.padding)
-        mask = tf.nn.max_pool3d(mask, [1, self.block_size, self.block_size, self.block_size, 1], [1, 1, 1, 1, 1], 'SAME')
+        mask = tf.nn.max_pool3d(mask, [1, self.block_size, self.block_size, self.block_size, 1], [1, 1, 1, 1, 1],
+                                'SAME')
         mask = 1 - mask
         return mask
 
@@ -152,9 +154,6 @@ def dice_coef_loss_with_CE(y_true, y_pred):
 def weighted_dice_with_CE(y_true, y_pred):
     CE = binary_crossentropy(y_true, y_pred)
     return 0.2 * (1 - dice_coef(y_true, y_pred)) + CE
-
-
-
 
 
 def resconv(inputlayer, outdim, name, is_batchnorm=True):
@@ -189,7 +188,7 @@ def slice_at_block(inputlayer, outdim, name='None'):
                    kernel_initializer='he_normal', activation='sigmoid', name=name + '_SABC')(x)
     x = TimeDistributed(Conv2D(
         1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)  # 04/22
-    x_3 = Reshape((4, 16, outdim//16, 1))(x_3)  # 04/22 keras 有 reshape layers
+    x_3 = Reshape((4, 16, outdim // 16, 1))(x_3)  # 04/22 keras 有 reshape layers
     x_3 = ConvLSTM2D(filters=1, kernel_size=(5, 5), padding='same', return_sequences=True, go_backwards=False,
                      kernel_initializer='he_normal', activation='sigmoid', name=name + '_CABC')(x_3)
 
@@ -246,9 +245,8 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, is
 
     merge6 = concatenate([drop3, up6], axis=-1)
 
-
     conv6 = resconv(merge6, 256, name='resblock3')
-    conv6 = slice_at_block(conv6, 512//2, name='DABC_1')
+    conv6 = slice_at_block(conv6, 512 // 2, name='DABC_1')
 
     up7 = TimeDistributed(Conv2DTranspose(
         128, kernel_size=2, strides=2, padding='same', kernel_initializer='he_normal'))(conv6)
@@ -259,7 +257,7 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, is
     merge7 = concatenate([conv2, up7], axis=-1)
 
     conv7 = resconv(merge7, 128, name='resblock4')
-    conv7 = slice_at_block(conv7, 256//2, name='DABC_2')
+    conv7 = slice_at_block(conv7, 256 // 2, name='DABC_2')
 
     up8 = TimeDistributed(Conv2DTranspose(
         64, kernel_size=2, strides=2, padding='same', kernel_initializer='he_normal'))(conv7)
@@ -270,7 +268,7 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, is
 
     conv8 = TimeDistributed(Conv2D(64, 3, activation='relu',
                                    padding='same', kernel_initializer='he_normal'))(merge8)
-    conv8 = slice_at_block(conv8, 128//2, name='DABC_3')
+    conv8 = slice_at_block(conv8, 128 // 2, name='DABC_3')
 
     conv8 = TimeDistributed(Conv2D(
         64, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv8)
@@ -280,7 +278,7 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, is
 
     model = Model(inputs=inputs, outputs=conv9)
     model.compile(optimizer=opt, loss=[weighted_dice_with_CE], metrics=[
-                  'accuracy', dice_coef])
+        'accuracy', dice_coef])
 
     if load_weighted:
         model.load_weights(load_weighted)

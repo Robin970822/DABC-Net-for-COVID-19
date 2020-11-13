@@ -1,6 +1,7 @@
 import numpy as np
 
 import tensorflow as tf
+
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 from read_all_data_from_nii_pipe import read_from_nii
@@ -41,8 +42,7 @@ def infer_colab(nii_path='', save_path='', sform_code=0):
 
     name = 'weight/Covid_05112327'
     model = Model.DABC(input_size=(4, 256, 256, 1),
-                          load_weighted=name)
-
+                       load_weighted=name)
 
     pred = my_evaluate(test_vol, test_mask, model, model_name_id=None, only_infer=True, )
     from read_all_data_from_nii_pipe import save_pred_to_nii
