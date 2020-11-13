@@ -14,26 +14,20 @@ This repository provide an implementation of DABC-Net (including graphical user 
 * Support for Covid-19 longitudinal study
 
 ## Table of Contents
-[test]:
-annotation
 * [Installation](#installation)
-* [Quick start](#Quick-start)
-    + [DABC-Net for desktop app](#dabc-net_for-desktop-app)
+* [Quick start](#quick-start)
+    + [DABC-Net for desktop app](#dabc-net-for-desktop-app)
     + [DABC-Net for Colab](#dabc-net-for-colab)
-    + [DABC-Net for Website](#DABC-Net-for-website)
+    + [DABC-Net for Website](#dabc-net-for-website)
 * [Progress prediction](#progress-prediction)
-    + [Model](#Model)
-    + [Usage](#Usage)   
-    + [Visualization of progress](#Visualization-of-progress)
-* [Data](#Data)
+    + [Model](#model)
+    + [Usage](#usage)   
+    + [Visualization of progress](#visualization-of-progress)
+* [Data](#data)
 * [Tutorial](#tutorial)    
 
 ## Installation
 If you run toolkit with packaged destop app, you can skip this step.
-
-[/DABC-Net is only tested on Windows. It may work on other operating systems as well but we do not guarantee that it will.
-/]:
-test
 
 An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
