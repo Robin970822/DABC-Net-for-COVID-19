@@ -1,10 +1,11 @@
-import numpy as np
 import keras
+import numpy as np
+from models import models_dropblock as Model
 import tensorflow as tf
+from evaluate_performance_pipeline import local_evaluate
+from read_all_data_from_nii_pipe import read_from_nii
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-
-from read_all_data_from_nii_pipe import read_from_nii
 
 
 def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive',
@@ -13,7 +14,6 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_cho
                       ):
     save_path = save_filename
     nii_path = nii_filename  # for Colab
-
     '''
     Check input (one) filename!
     '''
@@ -29,17 +29,12 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_cho
         print('Please chosen correct uncertainty name!')
         print(uc_chosen)
         return None
-
     all_src_data = read_from_nii(nii_path=nii_path, Hu_window=(-1000, 512), need_rotate=True)
-
     all_src_data = np.expand_dims(all_src_data, -1)
-
     all_mask_data = np.zeros_like(all_src_data)
-
     '''
 
     '''
-    from evaluate_performance_pipeline import local_evaluate
 
     print('\n**********\tInferring CT scans:\t**********\n')
 
@@ -51,8 +46,6 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_cho
         test_vol = test_vol[:-cut]
         test_mask = test_mask[:-cut]
     assert test_vol.shape[0] % 4 == 0
-
-    import models_dropblock as Model
 
     keras.backend.clear_session()
 

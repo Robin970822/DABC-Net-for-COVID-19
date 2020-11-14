@@ -1,81 +1,11 @@
 from __future__ import division
 from keras.models import Model
-from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, UpSampling2D, Reshape, core, Dropout, TimeDistributed
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from keras import backend as K
-from keras.utils.vis_utils import plot_model as plot
-from keras.optimizers import SGD
 from keras.optimizers import *
 from keras.layers import *
-
-from keras.losses import binary_crossentropy
-# from keras.losses import a
-import keras.backend as K
+from .loss import dice_coef, weighted_dice_with_CE
+from .block import resconv, slice_at_block
 
 smooth = 0.001
-
-
-def dice_coef(y_true, y_pred, smooth=1):  # 3D
-    intersection = K.sum(y_true * y_pred, axis=[1, 2, 3])
-    union = K.sum(y_true, axis=[1, 2, 3]) + K.sum(y_pred, axis=[1, 2, 3])
-    return K.mean((2. * intersection + smooth) / (union + smooth), axis=0)
-
-
-def dice_coefficient_loss(y_true, y_pred):
-    return 1 - dice_coef(y_true, y_pred)
-
-
-def dice_coef_loss_with_CE(y_true, y_pred):
-    CE = binary_crossentropy(y_true, y_pred)
-    return -dice_coef(y_true, y_pred) + CE
-
-
-def weighted_dice_with_CE(y_true, y_pred):
-    CE = binary_crossentropy(y_true, y_pred)
-    return 0.2 * (1 - dice_coef(y_true, y_pred)) + CE
-
-
-def resconv(inputlayer, outdim, name, is_batchnorm=True):
-    kinit = 'he_normal'
-    x = TimeDistributed(
-        Conv2D(outdim, 3, activation='relu', padding='same', kernel_initializer=kinit, name=name + '_1'))(inputlayer)
-
-    x1 = TimeDistributed(
-        Conv2D(outdim, 3, activation='relu', padding='same', kernel_initializer=kinit, name=name + '_2'))(x)
-    x2 = Add()([x, x1])
-
-    if is_batchnorm:
-        x2 = TimeDistributed(BatchNormalization(axis=3), name=name + '_2_bn')(x2)
-    return x2
-
-
-def slice_at_block(inputlayer, outdim, name='None'):
-    x_0 = TimeDistributed(DepthwiseConv2D(3, 1, padding='same', activation='relu', name=name + '_dw'),
-                          name='T_' + name + '_dw')(
-        inputlayer)
-
-    x_3 = TimeDistributed(GlobalAveragePooling2D(), name='T_' + name + '_gap')(inputlayer)
-
-    x = TimeDistributed(Conv2D(2, 1, padding='same', activation='relu', name=name + '_1*1'), name=name)(
-        x_0)
-    x = TimeDistributed(BatchNormalization(axis=3, name=name + '_bn'), name='T_' + name + '_bn')(x)
-    convfilter = 2
-    x = ConvLSTM2D(filters=convfilter, kernel_size=(3, 3), padding='same', return_sequences=True, go_backwards=False,
-                   kernel_initializer='he_normal', activation='sigmoid', name=name + '_SABC')(x)
-    x = TimeDistributed(Conv2D(1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)
-
-    x_3 = Reshape((4, 16, outdim // 16, 1))(x_3)
-    x_3 = ConvLSTM2D(filters=1, kernel_size=(5, 5), padding='same', return_sequences=True, go_backwards=False,
-                     kernel_initializer='he_normal', activation='sigmoid', name=name + '_CABC')(x_3)
-
-    x_3 = Reshape((4, 1, 1, outdim))(x_3)
-
-    x = Add()([x, x_3])
-    x = TimeDistributed(Activation('sigmoid'))(x)
-
-    x = Add()([x, inputlayer])
-    return x
 
 
 def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):

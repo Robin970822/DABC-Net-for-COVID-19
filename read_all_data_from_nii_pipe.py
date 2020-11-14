@@ -1,8 +1,4 @@
 from glob import glob
-from utils_mri import *
-import numpy as np
-# import matplotlib.pyplot as plt
-
 from scipy.misc.pilutil import imresize  # scipy<=1.1
 
 from utils_mri import *
