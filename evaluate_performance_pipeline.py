@@ -26,7 +26,7 @@ def local_evaluate(test_vol, test_mask, model, mode=3, only_infer=False, thresho
         te_data4 = np.array(te_data3)
         return te_data4
 
-    def get_evaluate_data(k=None, output_folder=None):
+    def get_evaluate_data(data, k=None, output_folder=None):
 
         """
         stack patches to slices
