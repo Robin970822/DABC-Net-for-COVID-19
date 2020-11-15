@@ -1,7 +1,7 @@
 from glob import glob
 from scipy.misc.pilutil import imresize  # scipy<=1.1
 
-from utils_mri import *
+from .utils_mri import *
 
 
 def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
@@ -113,7 +113,3 @@ def save_pred_to_nii(pred=None, save_path=r'E:\Lung\covid_data0424\label_V1pred/
     print('Done.')
 
     return None
-
-
-if __name__ == '__main__':
-    pass

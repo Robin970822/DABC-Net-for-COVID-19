@@ -2,17 +2,14 @@
 import pickle
 import json
 import tensorflow as tf
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 
 from keras.backend.tensorflow_backend import set_session
 from infer_colab import infer_colab
 from infer_uncertainty_colab import infer_uncertainty
-from read_all_data_from_nii_pipe import read_from_nii
-from postprocess_lung import remove_small_objects
-from visualization import *
-from calculate_feature import *
+from utils.read_all_data_from_nii_pipe import read_from_nii
+from utils.postprocess_lung import remove_small_objects
+from utils.visualization import *
+from utils.calculate_feature import *
 
 
 def predict_base_learners(base_learners, x):

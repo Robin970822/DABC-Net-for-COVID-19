@@ -1,10 +1,9 @@
-import os
 import keras
 import numpy as np
 from models import models_dropblock as Model
 import tensorflow as tf
 from evaluate_performance_pipeline import local_evaluate
-from read_all_data_from_nii_pipe import read_from_nii
+from utils.read_all_data_from_nii_pipe import read_from_nii
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
@@ -62,7 +61,7 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_cho
 
     pred = np.squeeze(np.array(pred))
 
-    from read_all_data_from_nii_pipe import save_pred_to_nii
+    from utils.read_all_data_from_nii_pipe import save_pred_to_nii
 
     pred = np.expand_dims(pred, 1)
     p_hat = pred

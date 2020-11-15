@@ -7,8 +7,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from glob import glob
-from calculate_feature import get_days
-from utils_mri import get_itk_array
+from .calculate_feature import get_days
+from .utils_mri import get_itk_array
 
 
 def transp_imshow(data, tvmin=None, tvmax=None, tmax=1.,

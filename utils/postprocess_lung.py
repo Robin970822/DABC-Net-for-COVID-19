@@ -3,9 +3,9 @@
 去除肺分割中假阳性
 
 """
-from utils_mri import *
+from .utils_mri import *
 from glob import glob
-from skimage import measure, morphology
+from skimage import measure
 
 
 def remove_small_objects(input_path='/*', output_path=None, return_nii=True):
