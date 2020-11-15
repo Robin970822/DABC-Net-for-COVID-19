@@ -1,3 +1,4 @@
+import os
 import keras
 import numpy as np
 from models import models_dropblock as Model
@@ -8,10 +9,9 @@ from read_all_data_from_nii_pipe import read_from_nii
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
-def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive',
-                      threshold_value=0.5, sform=None,
-                      uncertainty=0,
-                      ):
+def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive'):
+    if not os.path.exists(save_filename):
+        os.makedirs(save_filename)
     save_path = save_filename
     nii_path = nii_filename  # for Colab
     '''
@@ -58,7 +58,7 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_cho
 
     for i in range(samples[0]):
         pred.append(
-            local_evaluate(test_vol, test_mask, model, model_name_id=None, only_infer=True, threshold_after_infer=0))
+            local_evaluate(test_vol, test_mask, model, only_infer=True, threshold_after_infer=0))
 
     pred = np.squeeze(np.array(pred))
 

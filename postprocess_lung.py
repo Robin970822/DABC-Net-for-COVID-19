@@ -73,17 +73,17 @@ def remove_small_objects(input_path='/*', output_path=None, return_nii=True):
 
         for _tag, rank in enumerate(connected_regions_sorted):  # 误区第一/最大 连通域不是肺，是背景！故_tag要用低三大的比较第二大的！
             # print(num)
-            if _tag == 2 and connected_regions[rank] < connected_regions[
-                connected_regions_sorted.index(1)] * 0.3:  # 比较第二大*0.3
+            # 比较第二大*0.3
+            if _tag == 2 and connected_regions[rank] < connected_regions[connected_regions_sorted.index(1)] * 0.3:
                 nii = nii * (1 - np.array(label_matrix[0] == [rank]))
             if _tag > 2:
                 nii = nii * (1 - np.array(label_matrix[0] == [rank]))
 
         if return_nii:
             ref_nii = get_itk_image(name)
-            outname = output_path + '/' + name.split('\\')[-1]
+            output_name = output_path + '/' + name.split('\\')[-1]
             nii = nii.astype(float)
-            write_itk_imageArray(nii, outname, ref_nii)
+            write_itk_imageArray(nii, output_name, ref_nii)
             tag = tag + 1
             # continue
 

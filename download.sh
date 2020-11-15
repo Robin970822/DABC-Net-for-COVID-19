@@ -16,3 +16,9 @@ gdown --id 1Me-9TqTUMse1lbhGfxj2-CSSipq11nSH
 gdown --id 1_79uQZpZYnik2SbNPm-b4GNnTt96dPOx
 gdown --id 1BhBU6OxfIpMJsYfD5zkHMhhqJXZpmAg5
 cd ..
+
+mkdir -p meta
+cd meta
+gdown --id 1K2a6v708Eo7G64vq0YSVw_uinPcbipLH
+gdown --id 1j297o01OI2jEOjBzTVQyzmmFSJOW-kcW
+cd ..

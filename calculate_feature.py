@@ -8,8 +8,8 @@ def get_days(datetime):
     return datetime.days
 
 
-def get_sex(PatientSex):
-    return 1 if PatientSex == 'M' else 0
+def get_sex(patient_sex):
+    return 1 if patient_sex == 'M' else 0
 
 
 def min_max_scalar(x, min, max):
@@ -23,9 +23,9 @@ def crop_volume(volume, crop):
     return volume_
 
 
-def prob2binary(prob, thres=0.5):
+def prob2binary(prob, thresh=0.5):
     res = np.zeros_like(prob)
-    res[prob > 0.5] = 1
+    res[prob > thresh] = 1
     return res
 
 
@@ -49,7 +49,7 @@ def get_left_right(data, mid):
     return left, right
 
 
-def get_consolidation(raw_data, lung, lesion, thres=0.5):
+def get_consolidation(raw, lung, lesion, thresh=0.5):
     """ Consolidation from raw, lung and lesion
     """
     lung = prob2binary(lung)
@@ -65,11 +65,10 @@ def get_consolidation(raw_data, lung, lesion, thres=0.5):
     lung_lesion_union_open = cv2.morphologyEx(
         lung_lesion_union_close, cv2.MORPH_CLOSE, kernel)
 
-    lung_lesion_union_open_area = raw_data * \
-                                  lung_lesion_union_open[:raw_data.shape[0]]
+    lung_lesion_union_open_area = raw * lung_lesion_union_open[:raw.shape[0]]
 
     _, thres_image = cv2.threshold(
-        lung_lesion_union_open_area, thres, 1, cv2.THRESH_BINARY)
+        lung_lesion_union_open_area, thresh, 1, cv2.THRESH_BINARY)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
     thres_image = cv2.morphologyEx(thres_image, cv2.MORPH_CLOSE, kernel)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 1))
@@ -181,11 +180,11 @@ def calculate_volume(raw, lung, lesion, meta, crop=None):
     return res_list
 
 
-def calculate(raw_data, lung, lesion, meta):
+def calculate(raw, lung, lesion, meta):
     meta = meta[meta['slice'] > 300]  # select thin scans
     meta = meta.reset_index()  # DataFrame index reset
 
-    res_list = calculate_volume(raw_data, lung, lesion, meta, crop=[0.17, 0.08])
+    res_list = calculate_volume(raw, lung, lesion, meta, crop=[0.17, 0.08])
     all_info = pd.concat([meta, pd.DataFrame(res_list)], axis=1)
     return res_list, all_info
 

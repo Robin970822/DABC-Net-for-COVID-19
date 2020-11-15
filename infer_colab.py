@@ -36,7 +36,7 @@ def infer_colab(nii_path='', save_path='', usage='covid'):
         print('Please select correct model!')
         return None
     model = Model.DABC(input_size=(4, 256, 256, 1), load_weighted=name)
-    pred = local_evaluate(test_vol, test_mask, model, model_name_id=None, only_infer=True, )
+    pred = local_evaluate(test_vol, test_mask, model, only_infer=True, )
     save_pred_to_nii(pred=pred, save_path=save_path.replace('*', ''), ref_path=nii_path,
                      need_resize=True, need_rotate=True)
 
