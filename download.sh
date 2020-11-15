@@ -22,3 +22,6 @@ cd meta
 gdown --id 1K2a6v708Eo7G64vq0YSVw_uinPcbipLH
 gdown --id 1j297o01OI2jEOjBzTVQyzmmFSJOW-kcW
 cd ..
+
+gdown --id 1hIJyil3ME7JWJLUOYkX7KlWsJo9NRP5J
+unzip output.zip
