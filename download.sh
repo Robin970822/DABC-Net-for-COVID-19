@@ -26,4 +26,7 @@ cd ..
 gdown --id 1hIJyil3ME7JWJLUOYkX7KlWsJo9NRP5J
 unzip output.zip
 
+gdown --id 1S9AfoItRqo7pHhSEVsoDa4wGm_h_1Afc
+unzip model.zip
+
 export PYTHONPATH=$PYTHONPATH:$(pwd)
