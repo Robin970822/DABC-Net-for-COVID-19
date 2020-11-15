@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-import cv2
 import pickle
 import json
-import numpy as np
 import tensorflow as tf
+import numpy as np
 import pandas as pd
-import nibabel as nib
 import matplotlib.pyplot as plt
+
 from keras.backend.tensorflow_backend import set_session
-from glob import glob
-from utils_mri import get_itk_array
 from infer_colab import infer_colab
 from infer_uncertainty_colab import infer_uncertainty
 from read_all_data_from_nii_pipe import read_from_nii
