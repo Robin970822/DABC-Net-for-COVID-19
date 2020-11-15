@@ -25,3 +25,5 @@ cd ..
 
 gdown --id 1hIJyil3ME7JWJLUOYkX7KlWsJo9NRP5J
 unzip output.zip
+
+export PYTHONPATH=$PYTHONPATH:$(pwd)

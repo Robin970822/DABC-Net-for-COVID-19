@@ -6,7 +6,7 @@ import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from infer_colab import infer_colab
 from infer_uncertainty_colab import infer_uncertainty
-from utils.read_all_data_from_nii_pipe import read_from_nii
+from pipeline.data_pipeline import read_from_nii
 from utils.postprocess_lung import remove_small_objects
 from utils.visualization import *
 from utils.calculate_feature import *

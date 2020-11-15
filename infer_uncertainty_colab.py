@@ -2,8 +2,8 @@ import keras
 import numpy as np
 from models import models_dropblock as Model
 import tensorflow as tf
-from evaluate_performance_pipeline import local_evaluate
-from utils.read_all_data_from_nii_pipe import read_from_nii
+from pipeline.inference_pipeline import local_inference
+from pipeline.data_pipeline import read_from_nii, save_pred_to_nii, confirm_data
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
@@ -30,21 +30,9 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_cho
         return None
     all_src_data = read_from_nii(nii_path=nii_path, Hu_window=(-1000, 512), need_rotate=True)
     all_src_data = np.expand_dims(all_src_data, -1)
-    all_mask_data = np.zeros_like(all_src_data)
-    '''
-
-    '''
 
     print('\n**********\tInferring CT scans:\t**********\n')
-
-    test_vol = all_src_data
-    test_mask = np.zeros_like(all_mask_data)
-
-    if test_vol.shape[0] % 4 != 0:
-        cut = test_vol.shape[0] % 4
-        test_vol = test_vol[:-cut]
-        test_mask = test_mask[:-cut]
-    assert test_vol.shape[0] % 4 == 0
+    test_vol = confirm_data(all_src_data)
 
     keras.backend.clear_session()
 
@@ -57,11 +45,9 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_cho
 
     for i in range(samples[0]):
         pred.append(
-            local_evaluate(test_vol, test_mask, model, only_infer=True, threshold_after_infer=0))
+            local_inference(test_vol, model, threshold_after_infer=0))
 
     pred = np.squeeze(np.array(pred))
-
-    from utils.read_all_data_from_nii_pipe import save_pred_to_nii
 
     pred = np.expand_dims(pred, 1)
     p_hat = pred

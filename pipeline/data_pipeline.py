@@ -1,7 +1,13 @@
 from glob import glob
 from scipy.misc.pilutil import imresize  # scipy<=1.1
+from utils.utils_mri import *
 
-from .utils_mri import *
+
+def confirm_data(test_vol):
+    if test_vol.shape[0] % 4 != 0:
+        cut = test_vol.shape[0] % 4
+        test_vol = test_vol[:-cut]
+    assert test_vol.shape[0] % 4 == 0
 
 
 def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,

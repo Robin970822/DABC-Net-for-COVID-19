@@ -1,9 +1,8 @@
 import numpy as np
 import tensorflow as tf
-import models.models as Model
-from evaluate_performance_pipeline import local_evaluate
-from utils.read_all_data_from_nii_pipe import save_pred_to_nii
-from utils.read_all_data_from_nii_pipe import read_from_nii
+from models import models as Model
+from pipeline.inference_pipeline import local_inference
+from pipeline.data_pipeline import save_pred_to_nii, read_from_nii, confirm_data
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
@@ -13,18 +12,9 @@ def infer_colab(nii_path='', save_path='', usage='covid'):
     nii_path = nii_path + '/*'
     all_src_data = read_from_nii(nii_path=nii_path, Hu_window=(-1024, 512), need_rotate=True)
     all_src_data = np.expand_dims(all_src_data, -1)
-    all_mask_data = np.zeros_like(all_src_data)
-    '''
 
-    '''
     print('\n**********\tInferring CT scans:\t**********\n')
-    test_vol = all_src_data
-    test_mask = all_mask_data
-    if test_vol.shape[0] % 4 != 0:
-        cut = test_vol.shape[0] % 4
-        test_vol = test_vol[:-cut]
-        test_mask = test_mask[:-cut]
-    assert test_vol.shape[0] % 4 == 0
+    test_vol = confirm_data(all_src_data)
     '''
     infer
     '''
@@ -36,7 +26,7 @@ def infer_colab(nii_path='', save_path='', usage='covid'):
         print('Please select correct model!')
         return None
     model = Model.DABC(input_size=(4, 256, 256, 1), load_weighted=name)
-    pred = local_evaluate(test_vol, test_mask, model, only_infer=True, )
+    pred = local_inference(test_vol, model)
     save_pred_to_nii(pred=pred, save_path=save_path.replace('*', ''), ref_path=nii_path,
                      need_resize=True, need_rotate=True)
 
