@@ -1,9 +1,13 @@
-import numpy as np
 import keras
+import numpy as np
 import tensorflow as tf
+
+import models.models_dropblock as Model
+from utils.evaluate_performance_pipeline import local_evaluate
+from utils.read_all_data_from_nii_pipe import read_from_nii
+
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-from read_all_data_from_nii_pipe import read_from_nii
 
 
 def infer_uncertainty(nii_filename='', save_filename='', sample_value=10,uc_chosen='Predictive',
@@ -39,7 +43,6 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10,uc_chos
     '''
 
     '''
-    from evaluate_performance_pipeline import local_evaluate
 
     print('\n**********\tInferring CT scans:\t**********\n')
 
@@ -52,9 +55,6 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10,uc_chos
         test_mask = test_mask[:-cut]
     assert test_vol.shape[0]%4 == 0
 
-
-
-    import models_dropblock as Model
 
     keras.backend.clear_session()
 
@@ -71,7 +71,7 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10,uc_chos
 
     pred = np.squeeze(np.array(pred))
 
-    from read_all_data_from_nii_pipe import save_pred_to_nii
+    from utils.read_all_data_from_nii_pipe import save_pred_to_nii
 
     pred = np.expand_dims(pred, 1)
     p_hat = pred
@@ -81,7 +81,6 @@ def infer_uncertainty(nii_filename='', save_filename='', sample_value=10,uc_chos
     epistemic = np.mean(p_hat ** 2, axis=0) - np.mean(p_hat, axis=0) ** 2
 
     # ref_path = nii_path
-
 
     if uncertainty==0:
 

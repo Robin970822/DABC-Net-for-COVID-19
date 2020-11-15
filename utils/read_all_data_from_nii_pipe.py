@@ -1,12 +1,10 @@
 from glob import glob
-from utils_mri import *
-import numpy as np
 # import matplotlib.pyplot as plt
 
 from scipy.misc.pilutil import imresize  # scipy<=1.1
 
 
-from utils_mri import *
+from utils.utils_mri import *
 
 
 def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*',need_rotate=True,

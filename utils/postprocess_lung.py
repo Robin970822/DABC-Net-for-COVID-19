@@ -2,7 +2,7 @@
 """
 Remove false positive regions in lung segmentation.
 """
-from utils_mri import *
+from utils.utils_mri import *
 from glob import glob
 from skimage import measure
 
