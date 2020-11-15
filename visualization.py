@@ -89,7 +89,6 @@ def data_disease_slice(patientID, slice_id):
     ----------
     patientID:
     slice_id:
-    timepoint_count:
     """
 
     raw_list = glob(r'{}/*nii*'.format(patientID))
@@ -119,7 +118,8 @@ def data_disease_slice(patientID, slice_id):
         lung_volume.append(nii.sum())
         lung[i] = np.flip(nii[slice_id[i]], axis=0)
 
-    return raw, lung, lesion, np.array(lesion_volume)/np.array(lung_volume)
+    return raw, lung, lesion, np.array(lesion_volume) / np.array(lung_volume)
+
 
 # def plot_ratio():
 
@@ -154,7 +154,7 @@ def plot_segmentation(raw, lung, lesion, color_map, state):
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
-        plt.subplot(3, timepoint_count, timepoint_count*2 + i + 1)
+        plt.subplot(3, timepoint_count, timepoint_count * 2 + i + 1)
         plt.imshow(raw[i], cmap='gray')
         # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
         transp_imshow(lesion[i], cmap=color_map, alpha=0.7)
@@ -310,7 +310,6 @@ def plot_progress_curve(all_info, patientID, line_color=sns.color_palette('Reds'
     plt.scatter(severe_info['date'], severe_info['ratio'], color=colors[1], marker='^', s=100, alpha=1.0)
 
 
-# read data and plot progress
 def data_disease_progress_slice(all_info, patientID, slice_id, timepoint_count):
     """
     Load slice at slice_id of each CT scan and segmentation.
@@ -342,6 +341,18 @@ def data_disease_progress_slice(all_info, patientID, slice_id, timepoint_count):
 
 
 def plot_progress(raw, lesion, p, gt, color_map='Reds', state='severe', timepoint_count=8):
+    """
+    Display the disease progression.
+    Parameters
+    ----------
+    raw:
+    lesion:
+    p:
+    gt:
+    color_map:
+    state:
+    timepoint_count:
+    """
     fig = plt.figure(figsize=(30, 9))
 
     for i in range(timepoint_count):

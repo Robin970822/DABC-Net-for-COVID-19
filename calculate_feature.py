@@ -78,7 +78,9 @@ def get_consolidation(raw_data, lung, lesion, thres=0.5):
     return thres_image_open
 
 
-def calculate_volume(raw, lung, lesion, meta, crop=[0, 0]):
+def calculate_volume(raw, lung, lesion, meta, crop=None):
+    if crop is None:
+        crop = [0.0, 0.0]
     lung = prob2binary(lung)
     lesion = prob2binary(lesion)
     lung_lesion = lesion * lung
