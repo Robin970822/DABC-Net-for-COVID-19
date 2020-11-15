@@ -2,6 +2,7 @@
 import pickle
 import json
 import tensorflow as tf
+
 from keras.backend.tensorflow_backend import set_session
 from infer_colab import infer_colab
 from infer_uncertainty_colab import infer_uncertainty

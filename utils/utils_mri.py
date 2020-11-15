@@ -9,8 +9,8 @@ import numpy as np
 
 
 def make_itk_image(imageArray, protoImage=None):
-    ''' Create an itk image given an image numpy ndarray (imageArray) and an
-    itk proto-image (protoImage) to provide Origin, Spacing and Direction.'''
+    """ Create an itk image given an image numpy ndarray (imageArray) and an
+    itk proto-image (protoImage) to provide Origin, Spacing and Direction."""
 
     image = itk.GetImageFromArray(imageArray)
     if protoImage != None:
@@ -20,9 +20,9 @@ def make_itk_image(imageArray, protoImage=None):
 
 
 def make_itk_image_series(imageArray4D, protoImage):
-    ''' Create a 4D itk image given a 4-dimensional image numpy ndarray
+    """ Create a 4D itk image given a 4-dimensional image numpy ndarray
     (imageArray4D) and a 3-dimensional itk proto-image (protoImage) for the
-    3D volumes within the 4D array.'''
+    3D volumes within the 4D array."""
 
     if len(imageArray4D.shape) is not 4:
         print('This function is written for 4dimensional input arrays only')
@@ -46,7 +46,7 @@ def write_itk_imageArray(imageArray, filename, src_nii=None):
 
 
 def write_itk_image(image, filename):
-    ''' Write an itk image to a specified filename.'''
+    """ Write an itk image to a specified filename."""
 
     writer = itk.ImageFileWriter()
     writer.SetFileName(filename)
@@ -60,9 +60,9 @@ def write_itk_image(image, filename):
 
 
 def get_itk_image(filename):
-    ''' Get an itk image given an image filename of extionsion *TIFF, JPEG,
+    """ Get an itk image given an image filename of extionsion *TIFF, JPEG,
     PNG, BMP, DICOM, GIPL, Bio-Rad, LSM, Nifti, Analyze, SDT/SPR (Stimulate),
-    Nrrd or VTK images*.'''
+    Nrrd or VTK images*."""
 
     reader = itk.ImageFileReader()
     reader.SetFileName(filename)
@@ -73,9 +73,9 @@ def get_itk_image(filename):
 
 
 def get_itk_array(filenameOrImage, normalize=False):
-    ''' Get an image array given an image filename of extension *TIFF, JPEG,
+    """ Get an image array given an image filename of extension *TIFF, JPEG,
     PNG, BMP, DICOM, GIPL, Bio-Rad, LSM, Nifti, Analyze, SDT/SPR (Stimulate),
-    Nrrd or VTK images*.'''
+    Nrrd or VTK images*."""
 
     if isinstance(filenameOrImage, str):
         image = get_itk_image(filenameOrImage)
@@ -91,8 +91,8 @@ def get_itk_array(filenameOrImage, normalize=False):
 
 
 def get_itk_data(filenameOrImage, verbose=False):
-    ''' Get the image array, image size and pixel dimensions of a certain itk
-    image or an image specified by a certain filename (filenameOrImage).'''
+    """ Get the image array, image size and pixel dimensions of a certain itk
+    image or an image specified by a certain filename (filenameOrImage)."""
 
     if isinstance(filenameOrImage, str):
         image = get_itk_image(filenameOrImage)
@@ -113,7 +113,7 @@ def get_itk_data(filenameOrImage, verbose=False):
 
 
 def convert_to_nii(filenames):
-    ''' Convert image files to nifti image files.'''
+    """ Convert image files to nifti image files."""
 
     for filename in filenames:
         image = get_itk_image(filename)
@@ -124,7 +124,7 @@ def convert_to_nii(filenames):
 
 
 def convert_dicom(source_path, save_path):
-    '''
+    """
     converts dicom series to image format specified in path.
 
     Parameters
@@ -134,7 +134,7 @@ def convert_dicom(source_path, save_path):
     path : string
         path to save new image (extension determines image format)
 
-    '''
+    """
 
     image = read_dicom(source_path, verbose=True)
 
@@ -142,7 +142,7 @@ def convert_dicom(source_path, save_path):
 
 
 def read_dicom(source_path, verbose=True):
-    '''
+    """
     reads dicom series.
 
     Parameters
@@ -156,7 +156,7 @@ def read_dicom(source_path, verbose=True):
     -------
     image : itk image
         image volume.
-    '''
+    """
 
     reader = itk.ImageSeriesReader()
     names = reader.GetGDCMSeriesFileNames(source_path)
@@ -172,23 +172,23 @@ def read_dicom(source_path, verbose=True):
     return image
 
 
-def read_images(img_index=0):
-    patients = os.listdir(DATA_PATH)
+def read_images(data_path, name_dict, img_index=0):
+    patients = os.listdir(data_path)
     patients.sort()
     print("Found %i patients in the data path" % len(patients))
     data = []
     for p in patients:
-        img = get_itk_image(DATA_PATH + p + "/" + names_dict[img_index])
+        img = get_itk_image(data_path + p + "/" + name_dict[img_index])
         data.append(img)
     return data
 
 
-def get_2d_images(inputfn, outfolder, ext):
-    vol = get_itk_array(inputfn)
-    import matplotlib.pyplot as ml
+def get_2d_images(input_filename, output_folder, ext):
+    vol = get_itk_array(input_filename)
+    import matplotlib.pyplot as plt
     for index, img in enumerate(vol):
-        outfn = outfolder + '/' + str(index) + '.' + ext
-        ml._imsave(fname=outfn, arr=img, cmap='gray')
+        output_filename = output_folder + '/' + str(index) + '.' + ext
+        plt.imsave(fname=output_filename, arr=img, cmap='gray')
 
 
 def get_patch_data(volume4d, divs=(2, 2, 2, 1), offset=(5, 5, 5, 0)):
@@ -235,13 +235,7 @@ def get_volume_from_patches(patches5d, divs=(2, 2, 2, 1), offset=(5, 5, 5, 0)):
                 for t in np.arange(0, shape[3], widths[3]):
                     patch = patches5d[index]
                     index = index + 1
-                    volume4d[x:x + widths[0], y:y + widths[1], z:z + widths[2], t:t + widths[3]] = patch[
-                                                                                                   offset[0]:offset[0] +
-                                                                                                             widths[0],
-                                                                                                   offset[1]:offset[1] +
-                                                                                                             widths[1],
-                                                                                                   offset[2]:offset[2] +
-                                                                                                             widths[2],
-                                                                                                   offset[3]:offset[3] +
-                                                                                                             widths[3]]
+                    volume4d[x:x + widths[0], y:y + widths[1], z:z + widths[2], t:t + widths[3]] = \
+                        patch[offset[0]:offset[0] + widths[0], offset[1]:offset[1] + widths[1],
+                        offset[2]:offset[2] + widths[2], offset[3]:offset[3] + widths[3]]
     return volume4d

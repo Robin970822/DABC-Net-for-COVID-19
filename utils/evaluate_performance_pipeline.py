@@ -1,9 +1,7 @@
 import numpy as np
 
 
-def local_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer=False, save_pred_img=False,
-                   quick_compute=True,
-                   threshold_after_infer=0):
+def local_evaluate(test_vol, test_mask, model, mode=3, only_infer=False, threshold_after_infer=0.):
     """
     Load data
     threshold_after_infer: float 0-1.
@@ -28,13 +26,14 @@ def local_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer
         te_data4 = np.array(te_data3)
         return te_data4
 
-    def get_evaluate_data(data, k=None, outflod=None):
+    def get_evaluate_data(data, k=None, output_folder=None):
 
         """
         stack patches to slices
         (slices,patches,H,W,1) -> (slices*patches,H,W)
         :param data: None, as a placeholder.
         :param k: if k=1, save images.
+        :param output_folder:
         :return: stacked matrix.
         """
         pred = []
@@ -42,10 +41,9 @@ def local_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer
             for j in range(4):
                 if k:
                     from matplotlib import pyplot as plt
-                    plt.imsave(outflod + "{:0>4}".format(str(k)) + '_pred.png', predictions[i, j, :, :, 0],
-                               cmap='gray');
+                    plt.imsave(output_folder + "{:0>4}".format(str(k)) + '_pred.png', predictions[i, j, :, :, 0], cmap='gray')
                     k += 1
-                pred.append(predictions[i, j, :, :, 0])
+                pred.append(data[i, j, :, :, 0])
         return np.array(pred)
 
     if mode == 3:
@@ -58,10 +56,10 @@ def local_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer
 
     if mode == 3:
         predictions2 = get_evaluate_data(predictions)
-        te_data3 = get_evaluate_data(te_mask2)
+        te_mask3 = get_evaluate_data(te_mask2)
     else:
         predictions2 = predictions
-        te_data3 = te_mask2
+        te_mask3 = te_mask2
     predictions3 = predictions2
 
     if only_infer:
@@ -74,6 +72,4 @@ def local_evaluate(test_vol, test_mask, model, model_name_id, mode=3, only_infer
     '''
     evaluate
     '''
-    pass
-
     return None
