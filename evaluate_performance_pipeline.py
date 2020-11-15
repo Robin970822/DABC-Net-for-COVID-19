@@ -26,7 +26,7 @@ def local_evaluate(test_vol, test_mask, model, mode=3, only_infer=False, thresho
         te_data4 = np.array(te_data3)
         return te_data4
 
-    def get_evaluate_data(data, k=None, output_folder=None):
+    def get_evaluate_data(k=None, output_folder=None):
 
         """
         stack patches to slices
@@ -43,7 +43,7 @@ def local_evaluate(test_vol, test_mask, model, mode=3, only_infer=False, thresho
                     from matplotlib import pyplot as plt
                     plt.imsave(output_folder + "{:0>4}".format(str(k)) + '_pred.png', predictions[i, j, :, :, 0], cmap='gray')
                     k += 1
-                pred.append(data[i, j, :, :, 0])
+                pred.append(predictions[i, j, :, :, 0])
         return np.array(pred)
 
     if mode == 3:
