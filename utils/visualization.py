@@ -278,14 +278,14 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
     plt.title('Raw image:')
     # overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
     #         need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_src_.png')
-    plt.imshow(rawimg,cmap='gray')
+    plt.imshow(rawimg, cmap='gray')
     plt.xticks([]), plt.yticks([])
 
     plt.subplot(1, 4, 2)
     plt.title('Lesion segmentation:')
     # overlay(rawimg, our, np.zeros_like(rawimg), need_overlay_lesion=True)
     plt.imshow(rawimg, cmap='gray')
-    transp_imshow(our,cmap='Reds')
+    transp_imshow(our, cmap='Reds', alpha=0.7)
     plt.xticks([]), plt.yticks([])
 
     plt.subplot(1, 4, 3)
