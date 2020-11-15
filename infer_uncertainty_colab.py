@@ -9,8 +9,6 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
 def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive'):
-    if not os.path.exists(save_filename):
-        os.makedirs(save_filename)
     save_path = save_filename
     nii_path = nii_filename  # for Colab
     '''
