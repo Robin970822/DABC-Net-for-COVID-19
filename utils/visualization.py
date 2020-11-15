@@ -270,16 +270,20 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
 
     print('Slice: {0}/{1}'.format(slice_id, slices_num))
     plt.subplots(figsize=(16, 9))
-    plt.subplot(1, 3, 1)
+    plt.subplot(1, 4, 1)
     plt.title('Raw image:')
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_src_.png')
-    plt.subplot(1, 3, 2)
+
+    plt.subplot(1, 4, 2)
+    pass
+
+    plt.subplot(1, 4, 3)
     plt.title('Aleatoric uncertainty:')
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             aleatoric=aleatoric, need_overlay_alea=True,
             need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_Uc_alea_.png')
-    plt.subplot(1, 3, 3)
+    plt.subplot(1, 4, 4)
     plt.title('Epistemic uncertainty:')
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             epistemic=epistemic, need_overlay_epis=True,
