@@ -1,7 +1,7 @@
 from glob import glob
 from scipy.misc.pilutil import imresize  # scipy<=1.1
 
-from .utils_mri import *
+from utils.utils_mri import *
 
 
 def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
@@ -12,7 +12,8 @@ def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
     nii_path.sort()
     print('Finding ', len(nii_path), ' nii.gz format files.\t')
     tag = 1
-    total_list = []
+    # total_list = []
+    total_data = np.zeros((1, need_resize, need_resize))  # init
 
     for name in nii_path:
         nii = get_itk_array(name, False)
@@ -30,10 +31,10 @@ def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
             nii = nii[:, :, :, 0]
 
         slices = nii.shape[0]
-        if need_rotate:
-            for i in range(slices):
-                nii[i, :, :] = np.flip(nii[i, :, :])
-                nii[i, :, :] = np.flip(nii[i, :, :], axis=1)
+        # if need_rotate:  # this function can be added at the end
+        #     # for i in range(slices):
+        #     #     nii[i, :, :] = np.flip(nii[i, :, :])
+        #     #     nii[i, :, :] = np.flip(nii[i, :, :], axis=1)
 
         if need_resize:
             total_temp = np.zeros((slices, need_resize, need_resize))
@@ -43,11 +44,18 @@ def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
             total_temp = nii
 
         tag = tag + 1
-        total_list.append(total_temp)
+        # total_list.append(total_temp)
+        total_data = np.concatenate((total_data, total_temp), axis=0)
 
-    total = total_list.pop(0)
-    for i in total_list:
-        total = np.concatenate((total, i), 0)
+    # total = total_list.pop(0)
+    # for i in total_list:
+    #     total = np.concatenate((total, i), 0)
+
+    total = total_data[1:, ...]
+    del total_data
+    if need_rotate:
+        total = np.flip(total, axis=1)
+
 
     total_all = total
     if np.max(total_all) > 1:
@@ -113,3 +121,13 @@ def save_pred_to_nii(pred=None, save_path=r'E:\Lung\covid_data0424\label_V1pred/
     print('Done.')
 
     return None
+
+if __name__ == '__main__':
+    data = read_from_nii(r'D:\2020034797\*')
+
+    import matplotlib.pyplot as plt
+    temp = data[280]
+    plt.imshow(temp)
+    plt.show()
+    data = data -1
+    data = data -1

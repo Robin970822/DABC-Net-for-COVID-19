@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import models.models as Model
-from evaluate_performance_pipeline import local_evaluate
+from utils.evaluate_performance_pipeline import local_evaluate
 from utils.read_all_data_from_nii_pipe import save_pred_to_nii
 from utils.read_all_data_from_nii_pipe import read_from_nii
 
