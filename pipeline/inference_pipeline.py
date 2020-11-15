@@ -6,7 +6,6 @@ def local_inference(test_vol, model, mode=3, threshold_after_infer=0.):
     Load data
     threshold_after_infer: float 0-1.
     """
-    test_vol = test_vol
     if np.max(test_vol) > 1:
         test_vol = test_vol / 255.0
 

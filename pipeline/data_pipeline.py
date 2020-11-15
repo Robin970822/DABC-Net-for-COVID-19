@@ -8,6 +8,7 @@ def confirm_data(test_vol):
         cut = test_vol.shape[0] % 4
         test_vol = test_vol[:-cut]
     assert test_vol.shape[0] % 4 == 0
+    return test_vol
 
 
 def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
