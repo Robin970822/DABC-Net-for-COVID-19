@@ -95,6 +95,10 @@ def data_disease_slice(patientID, slice_id):
     lung_list = glob(r'{}_output/lung/*'.format(patientID))
     covid_list = glob(r'{}_output/covid/*'.format(patientID))
 
+    raw_list.sort()
+    lung_list.sort()
+    covid_list.sort()
+
     timepoint_count = len(raw_list)
     raw = np.zeros((timepoint_count, 512, 512))
     lesion = np.zeros((timepoint_count, 512, 512))
