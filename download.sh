@@ -17,6 +17,9 @@ gdown --id 1_79uQZpZYnik2SbNPm-b4GNnTt96dPOx
 gdown --id 1BhBU6OxfIpMJsYfD5zkHMhhqJXZpmAg5
 cd ..
 
+gdown --id 1S9AfoItRqo7pHhSEVsoDa4wGm_h_1Afc
+unzip model.zip
+
 mkdir -p meta
 cd meta
 gdown --id 1K2a6v708Eo7G64vq0YSVw_uinPcbipLH

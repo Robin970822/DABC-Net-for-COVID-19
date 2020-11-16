@@ -95,6 +95,10 @@ def data_disease_slice(patientID, slice_id):
     lung_list = glob(r'{}_output/lung/*'.format(patientID))
     covid_list = glob(r'{}_output/covid/*'.format(patientID))
 
+    raw_list.sort()
+    lung_list.sort()
+    covid_list.sort()
+
     timepoint_count = len(raw_list)
     raw = np.zeros((timepoint_count, 512, 512))
     lesion = np.zeros((timepoint_count, 512, 512))
@@ -121,10 +125,30 @@ def data_disease_slice(patientID, slice_id):
     return raw, lung, lesion, np.array(lesion_volume) / np.array(lung_volume)
 
 
-# def plot_ratio():
+def plot_segmentation_montage(raw, lung, lesion, state, patient_num=1, color_map='Reds'):
+    """
+    Displays the segmentation results (montage).
+    Parameters
+    ----------
+    raw: ndarray: shape like:(8, 512, 512) or list: [(8, 512, 512),(6, 512, 512)]
+    lung: segmentation results. Shape like:(8, 512, 512)
+    lesion:
+    state:
+    patient_num: int. 1 or 2.
+    color_map:
+    """
+
+    raw = raw - np.min(raw)
+    raw = raw * 1.0 / np.max(raw)
+
+    row1 = np.column_stack(raw)
+    # plt.imshow(row1,cmap='gray')
+    row2 = np.column_stack(lesion)
+    canvas = np.vstack((row1,row2))
+    plt.imshow(canvas, cmap='gray')
 
 
-def plot_segmentation(raw, lung, lesion, color_map, state):
+def plot_segmentation(raw, lung, lesion, color_map, state, hspace=-0.6):
     """
     Displays the segmentation results.
     Parameters
@@ -134,33 +158,34 @@ def plot_segmentation(raw, lung, lesion, color_map, state):
     lesion:
     color_map:
     state:
+    hspace: float, optional. The height of the padding between subplots, as a fraction of the average axes height.
     """
-    fig = plt.figure(figsize=(30, 9))
+    fig = plt.figure(figsize=(16, 9))
 
     timepoint_count = raw.shape[0]
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, i + 1)
+        plt.subplot(3, timepoint_count, i + 1)
         plt.imshow(raw[i], cmap='gray')
         plt.title('No.{} scan\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, timepoint_count + i + 1)
+        plt.subplot(3, timepoint_count, timepoint_count + i + 1)
         plt.imshow(raw[i], cmap='gray')
-        # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
-        transp_imshow(lung[i], cmap=color_map, alpha=0.7)
-        plt.title('No.{} scan lung\n'.format(i + 1), fontsize=16)
+        transp_imshow(lung[i], cmap='Greens', alpha=0.7)
+        # plt.title('No.{} scan lung\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
         plt.subplot(3, timepoint_count, timepoint_count * 2 + i + 1)
         plt.imshow(raw[i], cmap='gray')
-        # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
         transp_imshow(lesion[i], cmap=color_map, alpha=0.7)
-        plt.title('No.{} scan lesion\n'.format(i + 1), fontsize=16)
+        # plt.title('No.{} scan lesion\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
+    plt.subplots_adjust(hspace=hspace,wspace=0.0)
+    # plt.tight_layout()
     fig.suptitle('Progress of {} patient in longitudinal study'.format(state), fontsize=26)
     plt.show()
 
@@ -183,7 +208,7 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
 
     slices_num = rawimg.shape[-1]
 
-    our = nib.load(r'2020035365_output/covid/' + name_id).get_fdata()
+    our = nib.load(r'{}_output/covid/'.format(patientID) + name_id).get_fdata()
 
     our = our[:, :, slice_id]
 
@@ -195,7 +220,7 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
     epistemic = epistemic[:, :, slice_id]
 
     # sform_code==1:rot90,1. else:rot90,-1
-    if sform_code:
+    if sform_code == 1:
         rotate = 1
         aleatoric = np.rot90(aleatoric, rotate)
         epistemic = np.rot90(epistemic, rotate)
@@ -221,12 +246,12 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
         gt = _gt
 
         if need_crop:  # (row1,row2,c1,c2)
-            if 'cor' in need_save:
+            if 'cor' in str(need_save):
                 need_crop = (30, 350, 20, -20)
                 rawimg = rawimg[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 prediction = prediction[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 gt = gt[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
-            if 'radio' in need_save:
+            if 'radio' in str(need_save):
                 need_crop = (90, 570, 0, -1)
                 rawimg = rawimg[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 prediction = prediction[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
@@ -270,16 +295,23 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
 
     print('Slice: {0}/{1}'.format(slice_id, slices_num))
     plt.subplots(figsize=(16, 9))
-    plt.subplot(1, 3, 1)
+    plt.subplot(1, 4, 1)
     plt.title('Raw image:')
-    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
-            need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_src_.png')
-    plt.subplot(1, 3, 2)
+    plt.imshow(rawimg, cmap='gray')
+    plt.xticks([]), plt.yticks([])
+
+    plt.subplot(1, 4, 2)
+    plt.title('Lesion segmentation:')
+    plt.imshow(rawimg, cmap='gray')
+    transp_imshow(our, cmap='Reds', alpha=0.7)
+    plt.xticks([]), plt.yticks([])
+
+    plt.subplot(1, 4, 3)
     plt.title('Aleatoric uncertainty:')
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             aleatoric=aleatoric, need_overlay_alea=True,
             need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_Uc_alea_.png')
-    plt.subplot(1, 3, 3)
+    plt.subplot(1, 4, 4)
     plt.title('Epistemic uncertainty:')
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             epistemic=epistemic, need_overlay_epis=True,
@@ -323,8 +355,10 @@ def data_disease_progress_slice(all_info, patientID, slice_id, timepoint_count):
     gt = np.array(all_info['Severe'])
 
     raw_list = glob(r'{}/*nii*'.format(patientID))
-    # lung_list = glob(r'{}_output/lung/*'.format(patientID))
     covid_list = glob(r'{}_output/covid/*'.format(patientID))
+
+    raw_list.sort()
+    covid_list.sort()
 
     raw = np.zeros((timepoint_count, 512, 512))
     lesion = np.zeros((timepoint_count, 512, 512))
