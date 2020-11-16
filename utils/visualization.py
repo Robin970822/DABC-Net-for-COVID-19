@@ -187,7 +187,7 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
 
     slices_num = rawimg.shape[-1]
 
-    our = nib.load(r'2020035365_output/covid/' + name_id).get_fdata()
+    our = nib.load(r'{}_output/covid/'.format(patientID) + name_id).get_fdata()
 
     our = our[:, :, slice_id]
 
@@ -199,7 +199,7 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
     epistemic = epistemic[:, :, slice_id]
 
     # sform_code==1:rot90,1. else:rot90,-1
-    if sform_code:
+    if sform_code == 1:
         rotate = 1
         aleatoric = np.rot90(aleatoric, rotate)
         epistemic = np.rot90(epistemic, rotate)
@@ -225,12 +225,12 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
         gt = _gt
 
         if need_crop:  # (row1,row2,c1,c2)
-            if 'cor' in need_save:
+            if 'cor' in str(need_save):
                 need_crop = (30, 350, 20, -20)
                 rawimg = rawimg[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 prediction = prediction[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 gt = gt[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
-            if 'radio' in need_save:
+            if 'radio' in str(need_save):
                 need_crop = (90, 570, 0, -1)
                 rawimg = rawimg[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
                 prediction = prediction[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
@@ -274,16 +274,23 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
 
     print('Slice: {0}/{1}'.format(slice_id, slices_num))
     plt.subplots(figsize=(16, 9))
-    plt.subplot(1, 3, 1)
+    plt.subplot(1, 4, 1)
     plt.title('Raw image:')
-    overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
-            need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_src_.png')
-    plt.subplot(1, 3, 2)
+    plt.imshow(rawimg, cmap='gray')
+    plt.xticks([]), plt.yticks([])
+
+    plt.subplot(1, 4, 2)
+    plt.title('Lesion segmentation:')
+    plt.imshow(rawimg, cmap='gray')
+    transp_imshow(our, cmap='Reds', alpha=0.7)
+    plt.xticks([]), plt.yticks([])
+
+    plt.subplot(1, 4, 3)
     plt.title('Aleatoric uncertainty:')
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             aleatoric=aleatoric, need_overlay_alea=True,
             need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_Uc_alea_.png')
-    plt.subplot(1, 3, 3)
+    plt.subplot(1, 4, 4)
     plt.title('Epistemic uncertainty:')
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             epistemic=epistemic, need_overlay_epis=True,
