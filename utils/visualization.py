@@ -185,7 +185,6 @@ def plot_segmentation(raw, lung, lesion, color_map, state, hspace=-0.6):
         plt.xticks([]), plt.yticks([])
 
     plt.subplots_adjust(hspace=hspace,wspace=0.0)
-    print('hspace:',hspace)
     # plt.tight_layout()
     fig.suptitle('Progress of {} patient in longitudinal study'.format(state), fontsize=26)
     plt.show()
