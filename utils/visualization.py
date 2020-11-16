@@ -355,8 +355,10 @@ def data_disease_progress_slice(all_info, patientID, slice_id, timepoint_count):
     gt = np.array(all_info['Severe'])
 
     raw_list = glob(r'{}/*nii*'.format(patientID))
-    # lung_list = glob(r'{}_output/lung/*'.format(patientID))
     covid_list = glob(r'{}_output/covid/*'.format(patientID))
+
+    raw_list.sort()
+    covid_list.sort()
 
     raw = np.zeros((timepoint_count, 512, 512))
     lesion = np.zeros((timepoint_count, 512, 512))
