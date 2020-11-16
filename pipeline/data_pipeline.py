@@ -11,6 +11,60 @@ def confirm_data(test_vol):
     return test_vol
 
 
+# def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
+#                   need_resize=256, Hu_window=(-1000, 512), need_tune=None):
+#     # nii_path=glob(nii_path)
+#     nii_path = [_nii_path for _nii_path in glob(nii_path) if _nii_path.endswith('nii') or _nii_path.endswith('nii.gz')]
+#
+#     nii_path.sort()
+#     print('Finding ', len(nii_path), ' nii.gz format files.\t')
+#     tag = 1
+#     total_list = []
+#
+#     for name in nii_path:
+#         nii = get_itk_array(name, False)
+#         print('Reading:\t', name.split('/')[-1])
+#         print(nii.shape)
+#
+#         Hu_min = Hu_window[0]
+#         Hu_max = Hu_window[1]
+#         nii[nii < Hu_min] = Hu_min
+#         nii[nii > Hu_max] = Hu_max
+#         nii = nii - np.min(nii)
+#         nii = nii * 1.0 / np.max(nii)
+#
+#         if len(nii.shape) >= 4:
+#             nii = nii[:, :, :, 0]
+#
+#         slices = nii.shape[0]
+#         if need_rotate:
+#             for i in range(slices):
+#                 nii[i, :, :] = np.flip(nii[i, :, :])
+#                 nii[i, :, :] = np.flip(nii[i, :, :], axis=1)
+#
+#         if need_resize:
+#             total_temp = np.zeros((slices, need_resize, need_resize))
+#             for i in range(slices):
+#                 total_temp[i] = imresize(nii[i], (need_resize, need_resize))
+#         else:
+#             total_temp = nii
+#
+#         tag = tag + 1
+#         total_list.append(total_temp)
+#
+#     total = total_list.pop(0)
+#     for i in total_list:
+#         total = np.concatenate((total, i), 0)
+#
+#     total_all = total
+#     if np.max(total_all) > 1:
+#         total_all = total_all - np.min(total_all)
+#         total_all = total_all * 1.0 / np.max(total_all)
+#
+#     print('Done.')
+#
+#     return total_all
+
 def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
                   need_resize=256, Hu_window=(-1000, 512), need_tune=None):
     # nii_path=glob(nii_path)
@@ -18,8 +72,8 @@ def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
 
     nii_path.sort()
     print('Finding ', len(nii_path), ' nii.gz format files.\t')
-    tag = 1
-    total_list = []
+
+    total_data = np.zeros((1, need_resize, need_resize))  # init
 
     for name in nii_path:
         nii = get_itk_array(name, False)
@@ -37,10 +91,6 @@ def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
             nii = nii[:, :, :, 0]
 
         slices = nii.shape[0]
-        if need_rotate:
-            for i in range(slices):
-                nii[i, :, :] = np.flip(nii[i, :, :])
-                nii[i, :, :] = np.flip(nii[i, :, :], axis=1)
 
         if need_resize:
             total_temp = np.zeros((slices, need_resize, need_resize))
@@ -49,12 +99,12 @@ def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
         else:
             total_temp = nii
 
-        tag = tag + 1
-        total_list.append(total_temp)
+        total_data = np.concatenate((total_data, total_temp), axis=0)
 
-    total = total_list.pop(0)
-    for i in total_list:
-        total = np.concatenate((total, i), 0)
+    total = total_data[1:, ...]
+    del total_data
+    if need_rotate:
+        total = np.flip(total, axis=1)
 
     total_all = total
     if np.max(total_all) > 1:
@@ -64,7 +114,6 @@ def read_from_nii(nii_path=r'E:\Lung\covid_data0424\src/*', need_rotate=True,
     print('Done.')
 
     return total_all
-
 
 def save_pred_to_nii(pred=None, save_path=r'E:\Lung\covid_data0424\label_V1pred/',
                      ref_path=r'E:\Lung\covid_data0424\src/*',

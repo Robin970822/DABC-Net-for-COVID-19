@@ -125,10 +125,30 @@ def data_disease_slice(patientID, slice_id):
     return raw, lung, lesion, np.array(lesion_volume) / np.array(lung_volume)
 
 
-# def plot_ratio():
+def plot_segmentation_montage(raw, lung, lesion, state, patient_num=1, color_map='Reds'):
+    """
+    Displays the segmentation results (montage).
+    Parameters
+    ----------
+    raw: ndarray: shape like:(8, 512, 512) or list: [(8, 512, 512),(6, 512, 512)]
+    lung: segmentation results. Shape like:(8, 512, 512)
+    lesion:
+    state:
+    patient_num: int. 1 or 2.
+    color_map:
+    """
+
+    raw = raw - np.min(raw)
+    raw = raw * 1.0 / np.max(raw)
+
+    row1 = np.column_stack(raw)
+    # plt.imshow(row1,cmap='gray')
+    row2 = np.column_stack(lesion)
+    canvas = np.vstack((row1,row2))
+    plt.imshow(canvas, cmap='gray')
 
 
-def plot_segmentation(raw, lung, lesion, color_map, state):
+def plot_segmentation(raw, lung, lesion, color_map, state, hspace=-0.6):
     """
     Displays the segmentation results.
     Parameters
@@ -138,33 +158,35 @@ def plot_segmentation(raw, lung, lesion, color_map, state):
     lesion:
     color_map:
     state:
+    hspace: float, optional. The height of the padding between subplots, as a fraction of the average axes height.
     """
-    fig = plt.figure(figsize=(30, 9))
+    fig = plt.figure(figsize=(16, 9))
 
     timepoint_count = raw.shape[0]
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, i + 1)
+        plt.subplot(3, timepoint_count, i + 1)
         plt.imshow(raw[i], cmap='gray')
         plt.title('No.{} scan\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, timepoint_count + i + 1)
+        plt.subplot(3, timepoint_count, timepoint_count + i + 1)
         plt.imshow(raw[i], cmap='gray')
-        # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
-        transp_imshow(lung[i], cmap=color_map, alpha=0.7)
-        plt.title('No.{} scan lung\n'.format(i + 1), fontsize=16)
+        transp_imshow(lung[i], cmap='Greens', alpha=0.7)
+        # plt.title('No.{} scan lung\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
         plt.subplot(3, timepoint_count, timepoint_count * 2 + i + 1)
         plt.imshow(raw[i], cmap='gray')
-        # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
         transp_imshow(lesion[i], cmap=color_map, alpha=0.7)
-        plt.title('No.{} scan lesion\n'.format(i + 1), fontsize=16)
+        # plt.title('No.{} scan lesion\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
+    plt.subplots_adjust(hspace=hspace,wspace=0.0)
+    print('hspace:',hspace)
+    # plt.tight_layout()
     fig.suptitle('Progress of {} patient in longitudinal study'.format(state), fontsize=26)
     plt.show()
 
