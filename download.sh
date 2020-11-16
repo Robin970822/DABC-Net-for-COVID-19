@@ -15,6 +15,9 @@ cd weight
 gdown --id 1Me-9TqTUMse1lbhGfxj2-CSSipq11nSH
 gdown --id 1_79uQZpZYnik2SbNPm-b4GNnTt96dPOx
 gdown --id 1BhBU6OxfIpMJsYfD5zkHMhhqJXZpmAg5
+
+gdown --id 1S9AfoItRqo7pHhSEVsoDa4wGm_h_1Afc
+unzip model.zip
 cd ..
 
 mkdir -p meta
