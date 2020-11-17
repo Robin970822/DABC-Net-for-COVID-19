@@ -139,6 +139,8 @@ Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 ![](fig/tool_visual.png)
 
 ## DABC-Net for Colab
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/notebooks/welcome.ipynb)
+
 #### Inference:
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
@@ -173,7 +175,7 @@ infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleato
    - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
    
 
-For more detail, please refer to [notebook](https://drive.google.com/).
+For more detail, please refer to [notebook](https://colab.research.google.com/notebooks/welcome.ipynb).
 
 ##  DABC-Net for Website
 coming soon
