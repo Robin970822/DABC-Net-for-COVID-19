@@ -7,7 +7,7 @@ from pipeline.data_pipeline import save_pred_to_nii, read_from_nii, confirm_data
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
-def infer_colab(nii_path='', save_path='', usage='covid'):
+def DABC_infer(nii_path='', save_path='', usage='covid'):
     save_path = save_path + '/*'
     nii_path = nii_path + '/*'
     all_src_data = read_from_nii(nii_path=nii_path, Hu_window=(-1024, 512), need_rotate=True)
@@ -46,4 +46,4 @@ if __name__ == '__main__':
     elif 'gz' not in os.listdir(args.input)[0]:
         print('\nThe path does not contain nii.gz format files.\n')
     else:
-        infer_colab(nii_path=args.input, save_path=args.output)
+        DABC_infer(nii_path=args.input, save_path=args.output)

@@ -5,6 +5,8 @@ import pandas as pd
 import nibabel as nib
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from glob import glob
 from .calculate_feature import get_days
@@ -405,3 +407,157 @@ def plot_progress(raw, lesion, p, gt, color_map='Reds', state='severe', timepoin
 
     fig.suptitle('Progress of {} patient in longitudinal study'.format(state), fontsize=26)
     plt.show()
+
+'''
+
+'''
+def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
+    """
+    Display the features.
+    Parameters
+    ----------
+    all_info_severe:
+    all_info_mild:
+    save_to_html: e.g. results.html
+    """
+    # all_info = pd.read_csv('all_info.csv')
+    all_info_severe['date'] = (pd.to_datetime(all_info_severe['StudyDate']) - pd.to_datetime(all_info_severe['StudyDate']).iloc[0]).map(
+        get_days)
+    # all_info_mild = pd.read_csv('all_info_mild.csv')
+    all_info_mild['date'] = (pd.to_datetime(all_info_mild['StudyDate']) - pd.to_datetime(all_info_mild['StudyDate']).iloc[0]).map(
+        get_days)
+
+    fig = make_subplots(
+        rows=3, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.03,
+        specs=[[{"type": "table"}],
+               [{"type": "scatter"}],
+               [{"type": "scatter"}]]
+    )
+
+    # line plot - mild
+    fig.add_trace(
+        go.Scatter(
+            x=all_info_mild["date"],
+            y=all_info_mild["ratio"],
+            mode="lines",
+            name="mild",
+    #         fillcolor='Green',
+    #         marker={mark.color:'Green'},
+            marker={'color':'green','opacity':0.3,'size':30}
+        ),
+        row=3, col=1
+    )
+
+    # line plot - severe
+    fig.add_trace(
+        go.Scatter(
+            x=all_info_severe["date"],
+            y=all_info_severe["ratio"],
+            mode="lines",
+            name="Severe patient ratio",  # mouse hover event trace
+            marker={'color':'red','opacity':0.3,'size':30}
+
+        ),
+        row=3, col=1
+    )
+
+    # tabel - severe
+    fig.add_trace(
+        go.Table(
+            header=dict(
+                values=['patient<br>ID', 'slice', 'spacing',
+                        'shape', 'Patient<br>Sex', 'Study<br>Date', 'Inst.<br>Name',  # Inst.
+                        'Age', 'Severe', 'lung', 'lesion', 'ratio', 'lung<br>lesion', 'left<br>lung',
+                        'right<br>lung', 'left<br>lesion', 'right<br>lesion', 'left<br>ratio',
+                        'right<br>ratio', 'weighted<br>lesion', 'weighted<br>lung<br>lesion',
+                        'left<br>weighted<br>lesion', 'right<br>weighted<br>lesion', 'consolidation',
+                        'lesion<br>consolidation', 'left<br>consolidation', 'right<br>consolidation',
+                        'z', 'left<br>z', 'right<br>z'],
+                font=dict(size=10),
+                align="left"
+            ),
+            cells=dict(
+                values=[all_info_mild[k].tolist() for k in all_info_mild.columns[1:] if k not in ['index', 'filename', 'Manufacturer']],
+                align="left")
+        ),
+        row=1, col=1
+    )
+
+    # tabel - severe
+    fig.add_trace(
+        go.Table(
+            header=dict(
+                values=['patient<br>ID', 'slice', 'spacing',
+                        'shape', 'Patient<br>Sex', 'Study<br>Date', 'Inst.<br>Name',  # Inst.
+                        'Age', 'Severe', 'lung', 'lesion', 'ratio', 'lung<br>lesion', 'left<br>lung',
+                        'right<br>lung', 'left<br>lesion', 'right<br>lesion', 'left<br>ratio',
+                        'right<br>ratio', 'weighted<br>lesion', 'weighted<br>lung<br>lesion',
+                        'left<br>weighted<br>lesion', 'right<br>weighted<br>lesion', 'consolidation',
+                        'lesion<br>consolidation', 'left<br>consolidation', 'right<br>consolidation',
+                        'z', 'left<br>z', 'right<br>z'],
+                font=dict(size=10),
+                align="left"
+            ),
+            cells=dict(
+                values=[all_info_severe[k].tolist() for k in all_info_severe.columns[1:] if k not in ['index', 'filename', 'Manufacturer']],
+                align="left")
+        ),
+        row=2, col=1
+    )
+
+    fig.update_layout(
+        height=800,
+        showlegend=False,
+        title_text="Severe(red) and mild(green) patient progress curve",
+    )
+
+    fig.show()
+
+    if save_to_html:
+        fig.write_html('Progress curve.html')
+
+
+def plot_animation_curve(all_info, save_to_html=False):
+    """
+    Display the animation of curve.
+    Parameters
+    ----------
+    all_info: feature of severe or mild patient
+    save_to_html: e.g. results.html
+    """
+    x = all_info["date"]
+    y = all_info["ratio"]
+    fig = go.Figure(
+        data=[go.Scatter(x=[0, 0], y=[0, 0])],  # Start point
+        layout=go.Layout(
+            xaxis=dict(range=[0, 50], autorange=False),
+            yaxis=dict(range=[0, 0.15], autorange=False),
+            title="Click button to display animation of progress curve",
+            updatemenus=[dict(
+                type="buttons",
+                buttons=[dict(label="Display",
+                              method="animate",
+                              args=[None])])]
+        ),
+
+        frames=[go.Frame(data=[
+            go.Scatter(x=x[:1], y=y[:1], marker={'color': 'green', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[go.Scatter(x=x[:2], y=y[:2],
+                                          marker={'color': 'green', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[
+                    go.Scatter(x=np.array(x[:3]), y=(y[:3]), marker={'color': 'red', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[go.Scatter(x=x[:4], y=y[:4])]),
+                go.Frame(data=[go.Scatter(x=x[:5], y=y[:5])]),
+                go.Frame(data=[go.Scatter(x=x[:6], y=y[:6])]),
+                go.Frame(data=[go.Scatter(x=x[:7], y=y[:7], marker={'color': 'green', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[go.Scatter(x=x[:8], y=y[:8])],
+                         layout=go.Layout(title_text="Animation of severe patient progress curve"))]
+    )
+
+    fig.show()
+
+    if save_to_html:
+        fig.write_html('Animation of severe patient progress curve.html')
+

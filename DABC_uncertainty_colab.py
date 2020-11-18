@@ -8,7 +8,7 @@ from pipeline.data_pipeline import read_from_nii, save_pred_to_nii, confirm_data
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
-def infer_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive'):
+def DABC_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive'):
     save_path = save_filename
     nii_path = nii_filename  # for Colab
     '''
@@ -89,4 +89,4 @@ if __name__ == '__main__':
     elif 'gz' not in args.input:
         print('\nThe path does not contain nii.gz format files.\n')
     else:
-        infer_uncertainty(nii_filename=args.input, save_filename=args.output, uncertainty=args.uncertainty)
+        DABC_uncertainty(nii_filename=args.input, save_filename=args.output)
