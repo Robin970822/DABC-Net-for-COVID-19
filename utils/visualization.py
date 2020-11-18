@@ -511,14 +511,13 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
     fig.update_layout(
         height=800,
         showlegend=False,
-        title_text="Severe(red) and mild(green) patient progress curve",
+        title_text="Severe(Red; First table) and Mild(Green; Second table) patient progress curve",
     )
 
     fig.show()
 
     if save_to_html:
         fig.write_html('Progress curve.html')
-
 
 def plot_animation_curve(all_info, save_to_html=False):
     """

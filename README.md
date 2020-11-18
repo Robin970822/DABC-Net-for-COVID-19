@@ -52,6 +52,8 @@ The project folder looks like this:
 
 ```
 path
+├─ ... (Codes in DABC-Net-for-COVID-19 repository. Use download.sh to get following files) 
+│
 ├─Input_data
 │      2020034797_0123_2949_20200123015940_4.nii.gz
 │      2020034797_0125_3052_20200125111145_4.nii.gz
