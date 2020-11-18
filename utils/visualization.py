@@ -428,10 +428,11 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
         get_days)
 
     fig = make_subplots(
-        rows=3, cols=1,
+        rows=4, cols=1,
         shared_xaxes=True,
         vertical_spacing=0.03,
         specs=[[{"type": "table"}],
+               [{"type": "table"}],
                [{"type": "scatter"}],
                [{"type": "scatter"}]]
     )
@@ -442,7 +443,7 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
             x=all_info_mild["date"],
             y=all_info_mild["ratio"],
             mode="lines",
-            name="mild",
+            name="Mild-ratio",
     #         fillcolor='Green',
     #         marker={mark.color:'Green'},
             marker={'color':'green','opacity':0.3,'size':30}
@@ -456,14 +457,14 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
             x=all_info_severe["date"],
             y=all_info_severe["ratio"],
             mode="lines",
-            name="Severe patient ratio",  # mouse hover event trace
+            name="Severe-ratio",  # mouse hover event trace
             marker={'color':'red','opacity':0.3,'size':30}
 
         ),
         row=3, col=1
     )
 
-    # tabel - severe
+    # tabel - mild
     fig.add_trace(
         go.Table(
             header=dict(
@@ -482,7 +483,7 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
                 values=[all_info_mild[k].tolist() for k in all_info_mild.columns[1:] if k not in ['index', 'filename', 'Manufacturer']],
                 align="left")
         ),
-        row=1, col=1
+        row=2, col=1
     )
 
     # tabel - severe
@@ -504,7 +505,7 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
                 values=[all_info_severe[k].tolist() for k in all_info_severe.columns[1:] if k not in ['index', 'filename', 'Manufacturer']],
                 align="left")
         ),
-        row=2, col=1
+        row=1, col=1
     )
 
     fig.update_layout(
