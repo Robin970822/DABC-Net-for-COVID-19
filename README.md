@@ -141,19 +141,21 @@ Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 ![](fig/tool_visual.png)
 
 ## DABC-Net for Colab
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb)
+
 #### Inference:
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
 ```
 infer_colab(input_path, output_path)
 ```
-- nii_path : 
+- nii_path: 
     - Input: Folder path of input data(nii or nii.gz format).
     - Type: string
-- save_path : Folder path of output data. The segmentation results will be saved as nii.gz format.
-    - Input: Folder path of input data(nii or nii.gz format).
+- save_path: 
+    - Input: Folder path of input data(nii or nii.gz format). The segmentation results will be saved as nii.gz format.
     - Type: string 
-- usage
+- usage:
    - Input: Folder path of input data(nii or nii.gz format).
    - Type: string, 'lung' or 'covid'
 
@@ -161,13 +163,13 @@ infer_colab(input_path, output_path)
 ```
 infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
 ```
-- nii_filename : 
+- nii_filename: 
     - Input: Path of input data(nii or nii.gz format).
     - Type: string
-- save_filename :
+- save_filename:
     - Input: Folder path of input data(nii or nii.gz format).
     - Type: string 
-- sample_value
+- sample_value:
    - Input: number of Monte carlo samples.
    - Type: int
 - uncertainty:
@@ -175,7 +177,7 @@ infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleato
    - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
    
 
-For more detail, please refer to [notebook](https://drive.google.com/).
+For more detail, please refer to [notebook](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb).
 
 ##  DABC-Net for Website
 coming soon
