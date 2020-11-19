@@ -17,7 +17,7 @@ This repository provide an implementation of DABC-Net (including graphical user 
 * [Installation](#installation)
 * [Quick start](#quick-start)
     + [DABC-Net for desktop app](#dabc-net-for-desktop-app)
-    + [DABC-Net for Colab](#dabc-net-for-colab)
+    + [DABC-Net for Colab](#dabc-net-for-colab)  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb)
     + [DABC-Net for Website](#dabc-net-for-website)
 * [Progress prediction](#progress-prediction)
     + [Model](#model)
@@ -141,6 +141,7 @@ Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 ![](fig/tool_visual.png)
 
 ## DABC-Net for Colab
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb)
 
 #### Inference:
