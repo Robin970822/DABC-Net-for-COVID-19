@@ -94,7 +94,7 @@ It will take 3 mintues.
 
 """Make sure you are in DABC-Net-for-COVID-19"""
 
-!pwd
+pwd
 
 """## Set up environment and install all necessary packages
 
@@ -103,7 +103,7 @@ Make sure you have set **GPU** acceleration when you run this notebook. See your
 Note that you only use **xgboost==1.1.0** and **scikit-learn==0.21.3** to load the prediction model when you only need to run prediction and you can also skip inference steps.
 """
 
-!pip install SimpleITK tensorflow-gpu==1.15.4 keras==2.2.4 xgboost==1.1.0 scikit-learn==0.21.3 scipy==1.1
+pip install SimpleITK tensorflow-gpu==1.15.4 keras==2.2.4 xgboost==1.1.0 scikit-learn==0.21.3 scipy==1.1
 
 """# Step II:
 ## Lung and lesion Segmentation.
@@ -181,7 +181,7 @@ DABC_uncertainty('2020035365/2020035365_0204_3050_20200204184413_4.nii.gz', '202
 
 ## Visualisation of segmentation results, uncertainties and progress curve
 
-## Segmentation
+## Plot segmentation
 """
 
 import pandas as pd
@@ -213,7 +213,7 @@ plot_segmentation(raw_severe, lung_severe, lesion_severe, color_map='Reds', stat
 
 plot_segmentation(raw_mild, lung_mild, lesion_mild, color_map='Reds', state='Mild', hspace=-0.4)
 
-"""## Progress curve"""
+"""## Plot progress curve"""
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -226,7 +226,7 @@ plt.title('Severe pateint vs Mild pateint', fontsize=26)
 plt.xlabel('Time(Day)', fontsize=16)
 plt.ylabel('Lesion ratio', fontsize=16)
 
-"""## Uncertainty
+"""## Plot uncertainty
 
 """
 
@@ -295,7 +295,7 @@ del raw_data_mild, lung_mild, lesion_mild
 
 from utils.visualization import plot_fetures
 
-plot_fetures(all_info_severe=all_info_severe, all_info_mild=all_info_mild, save_to_html='features.html')  # x-axis:time(day), y-axis: lesion ratio
+plot_fetures(all_info_severe=all_info_severe, all_info_mild=all_info_mild, save_to_html=True)  # x-axis:time(day), y-axis: lesion ratio
 
 """Animation of progress curve"""
 

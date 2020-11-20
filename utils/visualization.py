@@ -420,20 +420,20 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
     all_info_mild:
     save_to_html: e.g. results.html
     """
-    # all_info = pd.read_csv('all_info.csv')
+    # all_info_severe = pd.read_csv('all_info.csv')
     all_info_severe['date'] = (pd.to_datetime(all_info_severe['StudyDate']) - pd.to_datetime(all_info_severe['StudyDate']).iloc[0]).map(
         get_days)
+
     # all_info_mild = pd.read_csv('all_info_mild.csv')
     all_info_mild['date'] = (pd.to_datetime(all_info_mild['StudyDate']) - pd.to_datetime(all_info_mild['StudyDate']).iloc[0]).map(
         get_days)
 
     fig = make_subplots(
-        rows=4, cols=1,
+        rows=3, cols=1,
         shared_xaxes=True,
         vertical_spacing=0.03,
         specs=[[{"type": "table"}],
                [{"type": "table"}],
-               [{"type": "scatter"}],
                [{"type": "scatter"}]]
     )
 
@@ -464,7 +464,7 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
         row=3, col=1
     )
 
-    # tabel - mild
+    # table - mild
     fig.add_trace(
         go.Table(
             header=dict(
@@ -480,13 +480,13 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
                 align="left"
             ),
             cells=dict(
-                values=[all_info_mild[k].tolist() for k in all_info_mild.columns[1:] if k not in ['index', 'filename', 'Manufacturer']],
+                values=[all_info_mild[k].tolist() for k in all_info_mild.columns[1:] if k not in ['index', 'filename', 'Manufacturer', 'date']],
                 align="left")
         ),
         row=2, col=1
     )
 
-    # tabel - severe
+    # table - severe
     fig.add_trace(
         go.Table(
             header=dict(
@@ -502,22 +502,23 @@ def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
                 align="left"
             ),
             cells=dict(
-                values=[all_info_severe[k].tolist() for k in all_info_severe.columns[1:] if k not in ['index', 'filename', 'Manufacturer']],
+                values=[all_info_severe[k].tolist() for k in all_info_severe.columns[1:] if k not in ['index', 'filename', 'Manufacturer', 'date']],
                 align="left")
         ),
         row=1, col=1
     )
 
     fig.update_layout(
-        height=800,
+        height=1000,
         showlegend=False,
-        title_text="Severe(Red; First table) and Mild(Green; Second table) patient progress curve",
+        title_text="Severe(First table; Red) and Mild(Second table; Green) patient tables and progress curves",
     )
 
     fig.show()
 
     if save_to_html:
-        fig.write_html('Progress curve.html')
+        fig.write_html('Feature.html')
+
 
 def plot_animation_curve(all_info, save_to_html=False):
     """
