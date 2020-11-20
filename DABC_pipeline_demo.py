@@ -94,7 +94,7 @@ It will take 3 mintues.
 
 """Make sure you are in DABC-Net-for-COVID-19"""
 
-pwd
+!pwd
 
 """## Set up environment and install all necessary packages
 
@@ -103,7 +103,7 @@ Make sure you have set **GPU** acceleration when you run this notebook. See your
 Note that you only use **xgboost==1.1.0** and **scikit-learn==0.21.3** to load the prediction model when you only need to run prediction and you can also skip inference steps.
 """
 
-pip install SimpleITK tensorflow-gpu==1.15.4 keras==2.2.4 xgboost==1.1.0 scikit-learn==0.21.3 scipy==1.1
+!pip install SimpleITK tensorflow-gpu==1.15.4 keras==2.2.4 xgboost==1.1.0 scikit-learn==0.21.3 scipy==1.1
 
 """# Step II:
 ## Lung and lesion Segmentation.
