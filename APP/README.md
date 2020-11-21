@@ -1,10 +1,11 @@
 
 # DABC-Net (app)
 
-##  Version: Windows 10 / Mac OS (not recommend because can not use Nvidia gpu)
+##  Version
 | Version       |      Windows | Mac os |
 | ------------ | ---------------------- | ------------------ |
-| Link			| [link](!dwq)	| [link](!23)	|
+| Link			| [link](https://pan.baidu.com/s/1YSDgEKIAmuPK_JYFHZu3oQ)	| [link](https://pan.baidu.com/s/1YSDgEKIAmuPK_JYFHZu3oQ)	|
+| Snapshot		|   <img src="../fig/fig1.png" width = "300" height = "200" alt="Snapshot on Win" align=center /> | <img src="../fig/snapshot_mac.png" width = "300" height = "200" alt="Snapshot on Mac" align=center /> |
 | Notes			|   -	| Not recommend because can not use Nvidia gpu |
 
 

@@ -27,7 +27,7 @@ This repository provide an implementation of DABC-Net (including graphical user 
 * [Tutorial](#tutorial)
 
 ## Installation
-If you run toolkit with packaged destop app, you can skip this step.
+If you run toolkit with packaged desktop app, you can skip this step.
 
 An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
@@ -148,7 +148,7 @@ Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
 ```
-infer_colab(input_path, output_path)
+DABC_infer(input_path, output_path)
 ```
 - nii_path: 
     - Input: Folder path of input data(nii or nii.gz format).
@@ -162,7 +162,7 @@ infer_colab(input_path, output_path)
 
 #### Uncertainty:
 ```
-infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
+DABC_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
 ```
 - nii_filename: 
     - Input: Path of input data(nii or nii.gz format).
@@ -225,7 +225,7 @@ For base learners sensitive to data normalization(svm, mlp, ...), we provide the
 
 ## Usage
 ### Prediction
-```python
+```
 pred = predict_base_learners(base_learners, feature)
 ```
 - base_learners: 
@@ -251,7 +251,7 @@ Here are some examples:
 
 x-axis: time(day), y-axis: lesion ratio
 
-#####  Visualization of different timepoint scans
+#####  Visualization of different time point scans
 
 ![](fig/progress_severe.png)
 
