@@ -1,16 +1,19 @@
 # DABC-Net
 
-DABC-Net toolkit is designed for easy-to-use, fast and real-time segmentation.
-It can provide insights of model performance to clinicians or medical experts by generating aleatory and epistemic uncertainty.
+DABC-Net toolkit is designed for fast and robust pneumonia segmentation and prediction of COVID-19 progression on chest CT scans. 
+The core of the toolkit, DABC-Net, is a novel deep learning (DL) network that combines a 2D U-net for intra-slice spatial information processing, and a recurrent LSTM network to leverage inter-slice context. 
+Compared to other popular volumetric segmentation networks such as 3D U-net, DABC-Net is much faster and more robust to CT scans with various slice thickness. 
 
-This repository provide an implementation of DABC-Net (including graphical user interface) and early triage of critically ill automatically.
+Based on DABC-Net segmentation, we can predict the disease progression, i.e. whether a specific patient will develop into a severe stage or not using his/her first two CT scans. 
+This repository provides an implementation of DABC-Net (including graphical user interface), which can be potentially used to support early triage of severe patients
 
 <b>The main features:</b>
-* Easy-to-use (You can run our toolkit with GUI and even no need to install Tensorflow or Python interpreter on you computer.)
+* Ready-to-use (You can run our toolkit with GUI and even no need to install Tensorflow or Python interpreter on your computer.)
 * Run everywhere (Desktop app, Web or console)
+* Data Anonymization by deleting CT header file
 * Fast segmentation
 * Built-in multi-types uncertainty
-* Early triage of critically ill automatically
+* Prediction of patient progression: mild vs severe
 * Support for Covid-19 longitudinal study
 
 ## Table of Contents
