@@ -106,7 +106,7 @@ The UI looks like this:
 
 2. Type or select the input folder where you store nii/nii.gz format CT scans data. The output results will be saved in the folder you specified.
 
-3. Choose the sform code name,  the default value is 'NIFTI_XFORM_SCANNER_ANAT', some scans without complete header files may loss this value. For more details about header files, please see this [site](https://brainder.org/2012/09/23/the-nifti-file-format/  "With a Title"). 
+3. Choose the [sform code](https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform_brief_usage) name,  the default value is 'NIFTI_XFORM_SCANNER_ANAT', some scans without complete header files may loss this value. For more details about header files, please see this [site](https://brainder.org/2012/09/23/the-nifti-file-format/  "With a Title"). 
 
 4. Click 'Run' button. After all the inference done, the progress bar window will be closed. 
    
