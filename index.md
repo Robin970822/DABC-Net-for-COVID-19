@@ -1,23 +1,26 @@
 # DABC-Net
 
-DABC-Net toolkit is designed for easy-to-use, fast and real-time segmentation.
-It can provide insights of model performance to clinicians or medical experts by generating aleatory and epistemic uncertainty.
+DABC-Net toolkit is designed for fast and robust pneumonia segmentation and prediction of COVID-19 progression on chest CT scans. 
+The core of the toolkit, DABC-Net, is a novel deep learning (DL) network that combines a 2D U-net for intra-slice spatial information processing, and a recurrent LSTM network to leverage inter-slice context. 
+Compared to other popular volumetric segmentation networks such as 3D U-net, DABC-Net is much faster and more robust to CT scans with various slice thickness. 
 
-This repository provide an implementation of DABC-Net (including graphical user interface) and early triage of critically ill automatically.
+Based on DABC-Net segmentation, we can predict the disease progression, i.e. whether a specific patient will develop into a severe stage or not using his/her first two CT scans. 
+This repository provides an implementation of DABC-Net (including graphical user interface), which can be potentially used to support early triage of severe patients
 
 <b>The main features:</b>
-* Easy-to-use (You can run our toolkit with GUI and even no need to install Tensorflow or Python interpreter on you computer.)
+* Ready-to-use (You can run our toolkit with GUI and even no need to install Tensorflow or Python interpreter on your computer.)
 * Run everywhere (Desktop app, Web or console)
+* Data Anonymization by deleting CT header file
 * Fast segmentation
 * Built-in multi-types uncertainty
-* Early triage of critically ill automatically
+* Prediction of patient progression: mild vs severe
 * Support for Covid-19 longitudinal study
 
 ## Table of Contents
 * [Installation](#installation)
 * [Quick start](#quick-start)
     + [DABC-Net for desktop app](#dabc-net-for-desktop-app)
-    + [DABC-Net for Colab](#dabc-net-for-colab)
+    + [DABC-Net for Colab](#dabc-net-for-colab)  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb)
     + [DABC-Net for Website](#dabc-net-for-website)
 * [Progress prediction](#progress-prediction)
     + [Model](#model)
@@ -27,7 +30,7 @@ This repository provide an implementation of DABC-Net (including graphical user 
 * [Tutorial](#tutorial)
 
 ## Installation
-If you run toolkit with packaged destop app, you can skip this step.
+If you run toolkit with packaged desktop app, you can skip this step.
 
 An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
@@ -44,14 +47,16 @@ Requirements:
 
 You need to download this repository and run following command:
 
-```shell
+```
 cd path/to/repository/
 pip install -r requirement.txt
 ```
 The project folder looks like this:
 
-```shell
+```
 path
+├─ ... (Codes in DABC-Net-for-COVID-19 repository. Use download.sh to get following files) 
+│
 ├─Input_data
 │      2020034797_0123_2949_20200123015940_4.nii.gz
 │      2020034797_0125_3052_20200125111145_4.nii.gz
@@ -139,40 +144,44 @@ Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 ![](fig/tool_visual.png)
 
 ## DABC-Net for Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb)
+
 #### Inference:
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
 ```
-infer_colab(input_path, output_path)
+DABC_infer(input_path, output_path)
 ```
-- nii_path : 
+- nii_path: 
     - Input: Folder path of input data(nii or nii.gz format).
     - Type: string
-- save_path : Folder path of output data. The segmentation results will be saved as nii.gz format.
-    - Input: Folder path of input data(nii or nii.gz format).
+- save_path: 
+    - Input: Folder path of input data(nii or nii.gz format). The segmentation results will be saved as nii.gz format.
     - Type: string 
-- usage
+- usage:
    - Input: Folder path of input data(nii or nii.gz format).
    - Type: string, 'lung' or 'covid'
 
 #### Uncertainty:
 ```
-infer_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
+DABC_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
 ```
-- nii_filename : 
+- nii_filename: 
     - Input: Path of input data(nii or nii.gz format).
     - Type: string
-- save_filename :
+- save_filename:
     - Input: Folder path of input data(nii or nii.gz format).
     - Type: string 
-- sample_value
+- sample_value:
    - Input: number of Monte carlo samples.
    - Type: int
 - uncertainty:
    - Input: Choose uncertainty. The results will be saved as nii.gz format.
-   - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'   
+   - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
+   
 
-For more detail, please refer to [notebook](https://drive.google.com/).
+For more detail, please refer to [notebook](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb).
 
 ##  DABC-Net for Website
 coming soon
@@ -219,7 +228,7 @@ For base learners sensitive to data normalization(svm, mlp, ...), we provide the
 
 ## Usage
 ### Prediction
-```python
+```
 pred = predict_base_learners(base_learners, feature)
 ```
 - base_learners: 
@@ -245,7 +254,7 @@ Here are some examples:
 
 x-axis: time(day), y-axis: lesion ratio
 
-#####  Visualization of different timepoint scans
+#####  Visualization of different time point scans
 
 ![](fig/progress_severe.png)
 
