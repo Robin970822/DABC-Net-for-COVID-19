@@ -106,7 +106,7 @@ The UI looks like this:
 
 2. Type or select the input folder where you store nii/nii.gz format CT scans data. The output results will be saved in the folder you specified.
 
-3. Choose the [sform code](https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform_brief_usage) name,  the default value is 'NIFTI_XFORM_SCANNER_ANAT', some scans without complete header files may loss this value. For more details about header files, please see this [site](https://brainder.org/2012/09/23/the-nifti-file-format/  "With a Title"). 
+3. Choose the [sform code](https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform_brief_usage) name,  the default value is 'NIFTI_XFORM_SCANNER_ANAT', some scans without complete header files may loss this value(e.g. data from radiopaedia.org). For more details about header files, please see this [site](https://brainder.org/2012/09/23/the-nifti-file-format/  "With a Title"). 
 
 4. Click 'Run' button. After all the inference done, the progress bar window will be closed. 
    
@@ -151,27 +151,30 @@ Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 1. Put your data in a folder.
 2. Select the input and output folder, and run following command:
 ```
-DABC_infer(input_path, output_path)
+DABC_infer(input_path, output_path, usage, sform_code)
 ```
 - nii_path: 
     - Input: Folder path of input data(nii or nii.gz format).
     - Type: string
 - save_path: 
-    - Input: Folder path of input data(nii or nii.gz format). The segmentation results will be saved as nii.gz format.
+    - Input: Folder path of output data(nii or nii.gz format). The segmentation results will be saved as nii.gz format.
     - Type: string 
 - usage:
-   - Input: Folder path of input data(nii or nii.gz format).
-   - Type: string, 'lung' or 'covid'
-
+   - Input: Inference type.
+   - Type: string, 'lung' or 'covid'(default)
+- sform_code:
+   - Input: Coordinate system. In general, some scans without header files(e.g. data from radiopaedia.org) got 'NIFTI_XFORM_UNKNOWN' sform code.
+   - Type: bool, 1 for 'NIFTI_XFORM_SCANNER_ANAT'(default) or 0 for 'OTHERS'.
+   
 #### Uncertainty:
 ```
-DABC_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleatoric')
+DABC_uncertainty(nii_filename, save_filename, sample_value, uncertainty, sform_code)
 ```
 - nii_filename: 
     - Input: Path of input data(nii or nii.gz format).
     - Type: string
 - save_filename:
-    - Input: Folder path of input data(nii or nii.gz format).
+    - Input: Folder path of output data(nii or nii.gz format).
     - Type: string 
 - sample_value:
    - Input: number of Monte carlo samples.
@@ -179,7 +182,10 @@ DABC_uncertainty(nii_filename, save_filename, sample_value, uncertainty='Aleator
 - uncertainty:
    - Input: Choose uncertainty. The results will be saved as nii.gz format.
    - Type: string, 'Predictive','Aleatoric','Epistemic' or 'Both'
-   
+- sform_code:
+   - Input: Coordinate system. In general, some scans without header files(e.g. data from radiopaedia.org) got 'NIFTI_XFORM_UNKNOWN' sform code.
+   - Type: bool, 1 for 'NIFTI_XFORM_SCANNER_ANAT'(default) or 0 for 'OTHERS'.
+  
 
 For more detail, please refer to [notebook](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb).
 

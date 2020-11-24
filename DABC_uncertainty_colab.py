@@ -8,7 +8,7 @@ from pipeline.data_pipeline import read_from_nii, save_pred_to_nii, confirm_data
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
-def DABC_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive'):
+def DABC_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chosen='Predictive', sform_code=1):
     save_path = save_filename
     nii_path = nii_filename  # for Colab
     '''
@@ -59,19 +59,19 @@ def DABC_uncertainty(nii_filename='', save_filename='', sample_value=10, uc_chos
     if uncertainty == 0:
 
         save_pred_to_nii(pred=np.squeeze(aleatoric), save_path=save_path + '\\aleatoric_', ref_path=nii_path,
-                         need_resize=True, need_rotate=True, need_threshold=False)
+                         need_resize=True, need_rotate=sform_code, need_threshold=False)
         save_pred_to_nii(pred=np.squeeze(epistemic), save_path=save_path + '\\epistemic_', ref_path=nii_path,
-                         need_resize=True, need_rotate=True, need_threshold=False)
+                         need_resize=True, need_rotate=sform_code, need_threshold=False)
     elif uncertainty == 1:
         save_pred_to_nii(pred=np.squeeze(aleatoric), save_path=save_path + '\\aleatoric_', ref_path=nii_path,
-                         need_resize=True, need_rotate=True, need_threshold=False)
+                         need_resize=True, need_rotate=sform_code, need_threshold=False)
     elif uncertainty == 2:
         save_pred_to_nii(pred=np.squeeze(epistemic), save_path=save_path + '\\epistemic_', ref_path=nii_path,
-                         need_resize=True, need_rotate=True, need_threshold=False)
+                         need_resize=True, need_rotate=sform_code, need_threshold=False)
     elif uncertainty == 4:
         save_pred_to_nii(pred=np.squeeze(epistemic + aleatoric), save_path=save_path + '\\predictive_',
                          ref_path=nii_path,
-                         need_resize=True, need_rotate=True, need_threshold=False)
+                         need_resize=True, need_rotate=sform_code, need_threshold=False)
 
 
 if __name__ == '__main__':
