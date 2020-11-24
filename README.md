@@ -30,7 +30,7 @@ This repository provides an implementation of DABC-Net (including graphical user
 * [Tutorial](#tutorial)
 
 ## Installation
-If you run toolkit with packaged desktop app, you can skip this step.
+If you run this toolkit with packaged desktop app, you can skip this step.
 
 An Nvidia GPU is needed for faster inference (about 16ms/slice on 1080ti gpu).
 
