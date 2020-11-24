@@ -148,13 +148,45 @@ def slice_at_block(inputlayer, outdim, name='None'):
     x = TimeDistributed(Conv2D(2, 1, padding='same', activation='relu', name=name + '_1*1'), name=name)(
         x_0)
     x = TimeDistributed(BatchNormalization(
-        axis=3, name=name + '_bn'), name='T_' + name + '_bn')(x)  # axis = 3 等价于 -1
+        axis=3, name=name + '_bn'), name='T_' + name + '_bn')(x)
     convfilter = 2
     x = ConvLSTM2D(filters=convfilter, kernel_size=(3, 3), padding='same', return_sequences=True, go_backwards=False,
                    kernel_initializer='he_normal', activation='sigmoid', name=name + '_SABC')(x)
     x = TimeDistributed(Conv2D(
-        1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)  # 04/22
-    x_3 = Reshape((4, 16, outdim // 16, 1))(x_3)  # 04/22 keras 有 reshape layers
+        1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)
+    x_3 = Reshape((4, 16, outdim // 16, 1))(x_3)
+    x_3 = ConvLSTM2D(filters=1, kernel_size=(5, 5), padding='same', return_sequences=True, go_backwards=False,
+                     kernel_initializer='he_normal', activation='sigmoid', name=name + '_CABC')(x_3)
+
+    x_3 = Reshape((4, 1, 1, outdim))(x_3)
+
+    x = Add()([x, x_3])
+    x = TimeDistributed(Activation('sigmoid'))(x)
+
+    x = Add()([x, inputlayer])
+    return x
+
+def slice_with_block(inputlayer, outdim, name='None'):
+    x_0 = TimeDistributed(DepthwiseConv2D(3, 1, padding='same', activation='relu', name=name + '_dw'),
+                          name='T_' + name + '_dw')(
+        inputlayer)
+
+    x_3 = TimeDistributed(GlobalAveragePooling2D(
+    ), name='T_' + name + '_gap')(inputlayer)
+
+    x = TimeDistributed(Conv2D(2, 1, padding='same', activation='relu', name=name + '_1*1'), name=name)(
+        x_0)
+    x = TimeDistributed(BatchNormalization(
+        axis=3, name=name + '_bn'), name='T_' + name + '_bn')(x)
+    convfilter = 2
+    x_1 = ConvLSTM2D(filters=convfilter, kernel_size=(3, 3), padding='same', return_sequences=True, go_backwards=False,
+                   kernel_initializer='he_normal', activation='sigmoid')(x)
+    x_2 = ConvLSTM2D(filters=convfilter, kernel_size=(3, 3), padding='same', return_sequences=True, go_backwards=True,
+                   kernel_initializer='he_normal', activation='sigmoid')(x)
+    x = Add()([x_1, x_2])
+    x = TimeDistributed(Conv2D(
+        1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)
+    x_3 = Reshape((4, 16, outdim // 16, 1))(x_3)
     x_3 = ConvLSTM2D(filters=1, kernel_size=(5, 5), padding='same', return_sequences=True, go_backwards=False,
                      kernel_initializer='he_normal', activation='sigmoid', name=name + '_CABC')(x_3)
 

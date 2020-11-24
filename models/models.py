@@ -11,7 +11,7 @@ smooth = 0.001
 def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):
     slices = input_size[0]
     droprate = 0.5
-    is_training = False
+    is_trainable = False
 
     inputs = Input(input_size)
     conv1 = TimeDistributed(Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal',
@@ -24,22 +24,22 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):
     pool2 = TimeDistributed(MaxPooling2D(pool_size=(2, 2)))(conv2)
     conv3 = resconv(pool2, 256, name='res_block2', is_batchnorm=True)
 
-    drop3 = TimeDistributed(Dropout(droprate))(conv3, training=False)
+    drop3 = TimeDistributed(Dropout(droprate))(conv3, training=is_trainable)
     pool3 = TimeDistributed(MaxPooling2D(pool_size=(2, 2)))(conv3)
     conv4 = TimeDistributed(Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(pool3)
     conv4_1 = TimeDistributed(Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv4)
-    drop4_1 = TimeDistributed(Dropout(droprate))(conv4_1, training=False)
+    drop4_1 = TimeDistributed(Dropout(droprate))(conv4_1, training=is_trainable)
     conv4_2 = TimeDistributed(Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(
         drop4_1)
     conv4_2 = TimeDistributed(Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(
         conv4_2)
-    conv4_2 = TimeDistributed(Dropout(droprate))(conv4_2, training=False)
+    conv4_2 = TimeDistributed(Dropout(droprate))(conv4_2, training=is_trainable)
     merge_dense = concatenate([conv4_2, drop4_1], axis=-1)
     conv4_3 = TimeDistributed(Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(
         merge_dense)
     conv4_3 = TimeDistributed(Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(
         conv4_3)
-    drop4_3 = TimeDistributed(Dropout(droprate))(conv4_3, training=False)
+    drop4_3 = TimeDistributed(Dropout(droprate))(conv4_3, training=is_trainable)
 
     up6 = TimeDistributed(
         Conv2DTranspose(256, kernel_size=2, strides=2, padding='same', kernel_initializer='he_normal'))(drop4_3)
