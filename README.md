@@ -106,7 +106,7 @@ The UI looks like this:
 
 2. Type or select the input folder where you store nii/nii.gz format CT scans data. The output results will be saved in the folder you specified.
 
-3. Choose the [sform code](https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qsform_brief_usage) name,  the default value is 'NIFTI_XFORM_SCANNER_ANAT', some scans without complete header files may loss this value(e.g. data from radiopaedia.org). For more details about header files, please see this [site](https://brainder.org/2012/09/23/the-nifti-file-format/  "With a Title"). 
+3. Choose the sform code name,  the default value is 'NIFTI_XFORM_SCANNER_ANAT'. Some scans without complete header files may loss this value(e.g. data from radiopaedia.org).In this case, please remember select sform name as 'OTHERS'. For more details about header files, please see this [site](https://brainder.org/2012/09/23/the-nifti-file-format/  "With a Title"). 
 
 4. Click 'Run' button. After all the inference done, the progress bar window will be closed. 
    
@@ -142,6 +142,14 @@ In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.
 Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
 
 ![](fig/tool_visual.png)
+
+#### Progress predict:
+* Meta data: Csv format data. Put the path of data or click 'Demo' button to get an example.
+* Method: Use First two scans / First three scans / First scan to predict the progress of disease.
+* Output path: (optional) Results will be save in txt file. If this value is empty, file will save in working directory. 
+
+![](fig/predict_ui.png)
+
 
 ## DABC-Net for Colab
 
