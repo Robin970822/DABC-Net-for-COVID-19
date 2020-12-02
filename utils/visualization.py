@@ -5,6 +5,8 @@ import pandas as pd
 import nibabel as nib
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from glob import glob
 from .calculate_feature import get_days
@@ -95,6 +97,10 @@ def data_disease_slice(patientID, slice_id):
     lung_list = glob(r'{}_output/lung/*'.format(patientID))
     covid_list = glob(r'{}_output/covid/*'.format(patientID))
 
+    raw_list.sort()
+    lung_list.sort()
+    covid_list.sort()
+
     timepoint_count = len(raw_list)
     raw = np.zeros((timepoint_count, 512, 512))
     lesion = np.zeros((timepoint_count, 512, 512))
@@ -121,10 +127,30 @@ def data_disease_slice(patientID, slice_id):
     return raw, lung, lesion, np.array(lesion_volume) / np.array(lung_volume)
 
 
-# def plot_ratio():
+def plot_segmentation_montage(raw, lung, lesion, state, patient_num=1, color_map='Reds'):
+    """
+    Displays the segmentation results (montage).
+    Parameters
+    ----------
+    raw: ndarray: shape like:(8, 512, 512) or list: [(8, 512, 512),(6, 512, 512)]
+    lung: segmentation results. Shape like:(8, 512, 512)
+    lesion:
+    state:
+    patient_num: int. 1 or 2.
+    color_map:
+    """
+
+    raw = raw - np.min(raw)
+    raw = raw * 1.0 / np.max(raw)
+
+    row1 = np.column_stack(raw)
+    # plt.imshow(row1,cmap='gray')
+    row2 = np.column_stack(lesion)
+    canvas = np.vstack((row1,row2))
+    plt.imshow(canvas, cmap='gray')
 
 
-def plot_segmentation(raw, lung, lesion, color_map, state):
+def plot_segmentation(raw, lung, lesion, color_map, state, hspace=-0.6):
     """
     Displays the segmentation results.
     Parameters
@@ -134,33 +160,34 @@ def plot_segmentation(raw, lung, lesion, color_map, state):
     lesion:
     color_map:
     state:
+    hspace: float, optional. The height of the padding between subplots, as a fraction of the average axes height.
     """
-    fig = plt.figure(figsize=(30, 9))
+    fig = plt.figure(figsize=(16, 9))
 
     timepoint_count = raw.shape[0]
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, i + 1)
+        plt.subplot(3, timepoint_count, i + 1)
         plt.imshow(raw[i], cmap='gray')
         plt.title('No.{} scan\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
-        plt.subplot(2, timepoint_count, timepoint_count + i + 1)
+        plt.subplot(3, timepoint_count, timepoint_count + i + 1)
         plt.imshow(raw[i], cmap='gray')
-        # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
-        transp_imshow(lung[i], cmap=color_map, alpha=0.7)
-        plt.title('No.{} scan lung\n'.format(i + 1), fontsize=16)
+        transp_imshow(lung[i], cmap='Greens', alpha=0.7)
+        # plt.title('No.{} scan lung\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
     for i in range(timepoint_count):
         plt.subplot(3, timepoint_count, timepoint_count * 2 + i + 1)
         plt.imshow(raw[i], cmap='gray')
-        # plt.imshow(lesion[i], alpha=0.5, cmap=color_map)
         transp_imshow(lesion[i], cmap=color_map, alpha=0.7)
-        plt.title('No.{} scan lesion\n'.format(i + 1), fontsize=16)
+        # plt.title('No.{} scan lesion\n'.format(i + 1), fontsize=16)
         plt.xticks([]), plt.yticks([])
 
+    plt.subplots_adjust(hspace=hspace,wspace=0.0)
+    # plt.tight_layout()
     fig.suptitle('Progress of {} patient in longitudinal study'.format(state), fontsize=26)
     plt.show()
 
@@ -214,7 +241,6 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
 
     def overlay(_src, _pred, _gt, need_crop=True, need_save=False,
                 need_overlay=True, need_overlay_alea=None, need_overlay_epis=False, aleatoric=None, epistemic=None,
-                need_overlay_lesion = False,
                 need_overlay_alea_scale=False):
         # need_save:'img_File_name'
         rawimg = _src
@@ -241,9 +267,6 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
             transp_imshow(TP, cmap='RdYlGn', alpha=0.7)
             transp_imshow(FP, cmap='cool', alpha=0.7)  #
             transp_imshow(FN, cmap='Wistia', alpha=0.7)
-        if need_overlay_lesion:
-            transp_imshow(our, cmap='Reds', alpha=0.7)
-
         if need_overlay_epis:
             if need_crop:
                 epistemic = epistemic[need_crop[0]:need_crop[1], need_crop[2]:need_crop[3]]
@@ -276,14 +299,11 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
     plt.subplots(figsize=(16, 9))
     plt.subplot(1, 4, 1)
     plt.title('Raw image:')
-    # overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
-    #         need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_src_.png')
     plt.imshow(rawimg, cmap='gray')
     plt.xticks([]), plt.yticks([])
 
     plt.subplot(1, 4, 2)
     plt.title('Lesion segmentation:')
-    # overlay(rawimg, our, np.zeros_like(rawimg), need_overlay_lesion=True)
     plt.imshow(rawimg, cmap='gray')
     transp_imshow(our, cmap='Reds', alpha=0.7)
     plt.xticks([]), plt.yticks([])
@@ -298,7 +318,7 @@ def plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', pat
     overlay(rawimg, np.zeros_like(rawimg), np.zeros_like(rawimg), need_crop=False, need_overlay=False,
             epistemic=epistemic, need_overlay_epis=True,
             need_save='{}_output/'.format(patientID) + name_id + str(slice_id) + '_Uc_epis_.png')
-    plt.show()
+
 
 def plot_progress_curve(all_info, patientID, line_color=sns.color_palette('Reds')[5], label='Severe'):
     """
@@ -337,8 +357,10 @@ def data_disease_progress_slice(all_info, patientID, slice_id, timepoint_count):
     gt = np.array(all_info['Severe'])
 
     raw_list = glob(r'{}/*nii*'.format(patientID))
-    # lung_list = glob(r'{}_output/lung/*'.format(patientID))
     covid_list = glob(r'{}_output/covid/*'.format(patientID))
+
+    raw_list.sort()
+    covid_list.sort()
 
     raw = np.zeros((timepoint_count, 512, 512))
     lesion = np.zeros((timepoint_count, 512, 512))
@@ -386,8 +408,157 @@ def plot_progress(raw, lesion, p, gt, color_map='Reds', state='severe', timepoin
     fig.suptitle('Progress of {} patient in longitudinal study'.format(state), fontsize=26)
     plt.show()
 
-if __name__ == '__main__':
-    import os
-    os.chdir(r'D:\\')
+'''
 
-    plot_uncertainty(name_id='2020035365_0204_3050_20200204184413_4.nii.gz', slice_id=175)
+'''
+def plot_fetures(all_info_severe, all_info_mild, save_to_html=False):
+    """
+    Display the features.
+    Parameters
+    ----------
+    all_info_severe:
+    all_info_mild:
+    save_to_html: e.g. results.html
+    """
+    # all_info_severe = pd.read_csv('all_info.csv')
+    all_info_severe['date'] = (pd.to_datetime(all_info_severe['StudyDate']) - pd.to_datetime(all_info_severe['StudyDate']).iloc[0]).map(
+        get_days)
+
+    # all_info_mild = pd.read_csv('all_info_mild.csv')
+    all_info_mild['date'] = (pd.to_datetime(all_info_mild['StudyDate']) - pd.to_datetime(all_info_mild['StudyDate']).iloc[0]).map(
+        get_days)
+
+    fig = make_subplots(
+        rows=3, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.03,
+        specs=[[{"type": "table"}],
+               [{"type": "table"}],
+               [{"type": "scatter"}]]
+    )
+
+    # line plot - mild
+    fig.add_trace(
+        go.Scatter(
+            x=all_info_mild["date"],
+            y=all_info_mild["ratio"],
+            mode="lines",
+            name="Mild-ratio",
+    #         fillcolor='Green',
+    #         marker={mark.color:'Green'},
+            marker={'color':'green','opacity':0.3,'size':30}
+        ),
+        row=3, col=1
+    )
+
+    # line plot - severe
+    fig.add_trace(
+        go.Scatter(
+            x=all_info_severe["date"],
+            y=all_info_severe["ratio"],
+            mode="lines",
+            name="Severe-ratio",  # mouse hover event trace
+            marker={'color':'red','opacity':0.3,'size':30}
+
+        ),
+        row=3, col=1
+    )
+
+    # table - mild
+    fig.add_trace(
+        go.Table(
+            header=dict(
+                values=['patient<br>ID', 'slice', 'spacing',
+                        'shape', 'Patient<br>Sex', 'Study<br>Date', 'Inst.<br>Name',  # Inst.
+                        'Age', 'Severe', 'lung', 'lesion', 'ratio', 'lung<br>lesion', 'left<br>lung',
+                        'right<br>lung', 'left<br>lesion', 'right<br>lesion', 'left<br>ratio',
+                        'right<br>ratio', 'weighted<br>lesion', 'weighted<br>lung<br>lesion',
+                        'left<br>weighted<br>lesion', 'right<br>weighted<br>lesion', 'consolidation',
+                        'lesion<br>consolidation', 'left<br>consolidation', 'right<br>consolidation',
+                        'z', 'left<br>z', 'right<br>z'],
+                font=dict(size=10),
+                align="left"
+            ),
+            cells=dict(
+                values=[all_info_mild[k].tolist() for k in all_info_mild.columns[1:] if k not in ['index', 'filename', 'Manufacturer', 'date']],
+                align="left")
+        ),
+        row=2, col=1
+    )
+
+    # table - severe
+    fig.add_trace(
+        go.Table(
+            header=dict(
+                values=['patient<br>ID', 'slice', 'spacing',
+                        'shape', 'Patient<br>Sex', 'Study<br>Date', 'Inst.<br>Name',  # Inst.
+                        'Age', 'Severe', 'lung', 'lesion', 'ratio', 'lung<br>lesion', 'left<br>lung',
+                        'right<br>lung', 'left<br>lesion', 'right<br>lesion', 'left<br>ratio',
+                        'right<br>ratio', 'weighted<br>lesion', 'weighted<br>lung<br>lesion',
+                        'left<br>weighted<br>lesion', 'right<br>weighted<br>lesion', 'consolidation',
+                        'lesion<br>consolidation', 'left<br>consolidation', 'right<br>consolidation',
+                        'z', 'left<br>z', 'right<br>z'],
+                font=dict(size=10),
+                align="left"
+            ),
+            cells=dict(
+                values=[all_info_severe[k].tolist() for k in all_info_severe.columns[1:] if k not in ['index', 'filename', 'Manufacturer', 'date']],
+                align="left")
+        ),
+        row=1, col=1
+    )
+
+    fig.update_layout(
+        height=1000,
+        showlegend=False,
+        title_text="Severe(First table; Red) and Mild(Second table; Green) patient tables and progress curves",
+    )
+
+    fig.show()
+
+    if save_to_html:
+        fig.write_html('Feature.html')
+
+
+def plot_animation_curve(all_info, save_to_html=False):
+    """
+    Display the animation of curve.
+    Parameters
+    ----------
+    all_info: feature of severe or mild patient
+    save_to_html: e.g. results.html
+    """
+    x = all_info["date"]
+    y = all_info["ratio"]
+    fig = go.Figure(
+        data=[go.Scatter(x=[0, 0], y=[0, 0])],  # Start point
+        layout=go.Layout(
+            xaxis=dict(range=[0, 50], autorange=False),
+            yaxis=dict(range=[0, 0.15], autorange=False),
+            title="Click button to display animation of progress curve",
+            updatemenus=[dict(
+                type="buttons",
+                buttons=[dict(label="Display",
+                              method="animate",
+                              args=[None])])]
+        ),
+
+        frames=[go.Frame(data=[
+            go.Scatter(x=x[:1], y=y[:1], marker={'color': 'green', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[go.Scatter(x=x[:2], y=y[:2],
+                                          marker={'color': 'green', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[
+                    go.Scatter(x=np.array(x[:3]), y=(y[:3]), marker={'color': 'red', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[go.Scatter(x=x[:4], y=y[:4])]),
+                go.Frame(data=[go.Scatter(x=x[:5], y=y[:5])]),
+                go.Frame(data=[go.Scatter(x=x[:6], y=y[:6])]),
+                go.Frame(data=[go.Scatter(x=x[:7], y=y[:7], marker={'color': 'green', 'opacity': 0.3, 'size': 10})]),
+                go.Frame(data=[go.Scatter(x=x[:8], y=y[:8])],
+                         layout=go.Layout(title_text="Animation of severe patient progress curve"))]
+    )
+
+    fig.show()
+
+    if save_to_html:
+        fig.write_html('Animation of severe patient progress curve.html')
+
