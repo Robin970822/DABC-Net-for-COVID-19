@@ -15,14 +15,22 @@ set backend to avoid OOM error
 # config.gpu_options.allow_growth = True
 # set_session(tf.Session(config=config))
 
+'''
+Make dataset
+(Not sure data from cryoelectron microscopy whether can be loaded by SimpleITK)
+
+Shape of source and label data: (slices, Height, Width, channel)
+The slices need to be arranged in order(without shuffle).
+'''
+pass
 
 '''
 read all data from .npy
-Got shape: (138, 200, 200, 1),(slices, Height, Width, channel)
+Got shape: (slices, 256, 256, 1)
 '''
-all_src_data = np.load('all_covid_src_7.npy')
+all_src_data = np.load('path-to-source-data.npy')
 all_src_data = np.expand_dims(all_src_data, -1)
-all_mask_data = np.load('all_covid_label_7.npy')
+all_mask_data = np.load('path-to-label-data.npy')
 all_mask_data = np.expand_dims(all_mask_data, -1)
 
 if np.max(all_src_data) > 1:
@@ -32,7 +40,6 @@ if np.max(all_mask_data) > 1:
     all_mask_data = all_mask_data / 255.0
     print('Normlised!\n')
 print('Data loaded !\n')
-
 
 '''
 data generator
@@ -92,7 +99,7 @@ def train_func(model_name_id, opt = 'Adam(lr = 1e-4)', _test_vol=None, _test_mas
     print('######\t model_name_id: '+model_name_id)
     print('using opt: '+opt)
     opt_name = eval(opt)
-    model = models.DABC(input_size=(4, 256, 256, 1), opt=opt_name)
+    model = models.DABC(input_size=(4, 256, 256, 1), opt=opt_name)  # Customize the model structure here before training if you need
     if init_weight:  # for transfer learning and fine-tune
         model = model.DABC(input_size=(4, 256, 256, 1), opt=opt_name, load_weighted=init_weight)
         print('\t init weight has been loaded!')
@@ -177,7 +184,7 @@ for train, test in kf.split(all_src_data,all_mask_data):
 
     from models import models
     # import models_dropblock as M
-    train_func(model_name_id='Covid_DropBlock_7th_manual_dropblock_7_0dot9_epoch50_No Aug_fold' + str(tag) + '_',
+    train_func(model_name_id='define-your-model-name-here' + str(tag) + '_',
                opt='Adam(lr = 1e-4)', _test_vol=test_vol, _test_mask=test_mask)
 
     tag = tag+1
