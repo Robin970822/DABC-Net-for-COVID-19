@@ -9,13 +9,13 @@ smooth = 0.001
 
 
 def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):
-    slices = input_size[0]
+    _slice_count = input_size[0]
     droprate = 0.5
     is_trainable = False
 
     inputs = Input(input_size)
     conv1 = TimeDistributed(Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal',
-                                   input_shape=(slices, None, None, 1)))(inputs)
+                                   input_shape=(_slice_count, None, None, 1)))(inputs)
     conv1 = TimeDistributed(Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv1)
 
     pool1 = TimeDistributed(MaxPooling2D(pool_size=(2, 2)))(conv1)
@@ -49,7 +49,7 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):
     merge6 = concatenate([drop3, up6], axis=-1)
 
     conv6 = resconv(merge6, 256, name='resblock3')
-    conv6 = slice_at_block(conv6, 512 // 2, name='DABC_1')
+    conv6 = slice_at_block(conv6, 512 // 2, _slice_count,name='DABC_1')
 
     up7 = TimeDistributed(
         Conv2DTranspose(128, kernel_size=2, strides=2, padding='same', kernel_initializer='he_normal'))(conv6)
@@ -58,7 +58,7 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):
 
     merge7 = concatenate([conv2, up7], axis=-1)
     conv7 = resconv(merge7, 128, name='resblock4')
-    conv7 = slice_at_block(conv7, 256 // 2, name='DABC_2')
+    conv7 = slice_at_block(conv7, 256 // 2, _slice_count, name='DABC_2')
 
     up8 = TimeDistributed(
         Conv2DTranspose(64, kernel_size=2, strides=2, padding='same', kernel_initializer='he_normal'))(conv7)
@@ -68,7 +68,7 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):
     merge8 = concatenate([conv1, up8], axis=-1)
 
     conv8 = TimeDistributed(Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(merge8)
-    conv8 = slice_at_block(conv8, 128 // 2, name='DABC_3')
+    conv8 = slice_at_block(conv8, 128 // 2, _slice_count, name='DABC_3')
 
     conv8 = TimeDistributed(Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv8)
     conv8 = TimeDistributed(Conv2D(2, 3, activation='relu', padding='same', kernel_initializer='he_normal'))(conv8)

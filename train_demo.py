@@ -9,17 +9,26 @@ from sklearn.model_selection import KFold
 (optional)
 set backend to avoid OOM error
 """
-# import tensorflow as tf
-# from keras.backend.tensorflow_backend import set_session
-# config = tf.ConfigProto()
-# config.gpu_options.allow_growth = True
-# set_session(tf.Session(config=config))
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+set_session(tf.Session(config=config))
+
+'''
+Parameter
+'''
+Slice_count = 6
+Height = 256
+Width = 256
+Channel = 1  # for grayscale image
+Batch_size = 1
 
 '''
 Make dataset
-(Not sure data from cryoelectron microscopy whether can be loaded by SimpleITK)
+(Not sure customized data whether can be loaded by SimpleITK)
 
-Shape of source and label data: (slices, Height, Width, channel)
+Shape of source and label data: (slices, Height, Width, channel). Type: numpy.ndarray
 The slices need to be arranged in order(without shuffle).
 '''
 pass
@@ -58,8 +67,7 @@ def gen_chunk(in_img, in_mask, slice_count = 2, batch_size = 16):
 Augmentation(optional)
 If empty, this procedure will skip
 '''
-from keras.preprocessing.image import ImageDataGenerator  # for tf<2
-# from tensorflow.keras.preprocessing.image import ImageDataGenerator  # for tf2.0
+from keras.preprocessing.image import ImageDataGenerator
 
 d_gen = ImageDataGenerator(
                                # # rotation_range=45,
@@ -79,10 +87,10 @@ d_gen = ImageDataGenerator(
 
 def gen_aug_chunk(in_gen):
     for i, (x_img, y_img) in enumerate(in_gen):
-        xy_block = np.concatenate([x_img, y_img], 1).swapaxes(1, 4)[:, 0]
+        xy_block = np.concatenate([x_img, y_img], 1).swapaxes(1, -1)[:, 0]
         img_gen = d_gen.flow(xy_block, shuffle=True, seed=i, batch_size = x_img.shape[0])
         xy_scat = next(img_gen)
-        xy_scat = np.expand_dims(xy_scat,1).swapaxes(1, 4)
+        xy_scat = np.expand_dims(xy_scat,1).swapaxes(1, -1)
         yield xy_scat[:, :xy_scat.shape[1]//2], xy_scat[:, xy_scat.shape[1]//2:]
 
 
@@ -99,26 +107,28 @@ def train_func(model_name_id, opt = 'Adam(lr = 1e-4)', _test_vol=None, _test_mas
     print('######\t model_name_id: '+model_name_id)
     print('using opt: '+opt)
     opt_name = eval(opt)
-    model = models.DABC(input_size=(4, 256, 256, 1), opt=opt_name)  # Customize the model structure here before training if you need
+    model = models.DABC(input_size=(Slice_count, Height, Width, Channel), opt=opt_name)
     if init_weight:  # for transfer learning and fine-tune
-        model = model.DABC(input_size=(4, 256, 256, 1), opt=opt_name, load_weighted=init_weight)
+        model = model.DABC(input_size=(Slice_count, Height, Width, Channel), opt=opt_name, load_weighted=init_weight)
         print('\t init weight has been loaded!')
 
     import time
     time_id = np.int64(time.strftime('%Y%m%d%H%M', time.localtime(time.time())))
     time_id = str(time_id)[-8:]  # '02131414'
 
+    if not os.path.exists('weight'):
+        os.makedirs('weight')
     weight_path = 'weight/' + model_name_id + time_id
-    print('########\t Save_weight_path: ',weight_path)
+    print('\n********\t Save_weight_path: ', weight_path, '\t********\n')
 
     checkpoint = ModelCheckpoint(weight_path, monitor='val_loss', verbose=1,
                                  save_best_only=True, mode='min', save_weights_only = True)  # monitor='val_loss' or dice
 
-    reduceLROnPlat = ReduceLROnPlateau(monitor='val_loss', factor=0.5, min_lr=1e-6, patience=15, verbose=1, epsilon=1e-4, mode='min')  # lr*factor
+    reduceLROnPlat = ReduceLROnPlateau(monitor='val_loss', factor=0.5, min_lr=1e-6, patience=15, verbose=1, epsilon=1e-4, mode='min')
 
     early = EarlyStopping(monitor="val_loss",
                           mode="min",
-                          patience=15)
+                          patience=30)
     # save model
     callbacks_list = [
                     checkpoint,
@@ -128,7 +138,7 @@ def train_func(model_name_id, opt = 'Adam(lr = 1e-4)', _test_vol=None, _test_mas
                      ]
 
     model.fit_generator(train_aug_gen,
-                            epochs=50,
+                            epochs=1,  # 50
                             steps_per_epoch = 100,
                             validation_data = valid_gen,
                             validation_steps=50,
@@ -140,7 +150,7 @@ def train_func(model_name_id, opt = 'Adam(lr = 1e-4)', _test_vol=None, _test_mas
     '''
     evaluate and write result to file
     '''
-    local_evaluate(_test_vol, _test_mask, model, model_name_id, )
+    local_evaluate(_test_vol, _test_mask, model, _slice_count=Slice_count, threshold_after_infer=0.5)  # _test_vol:(312, 256, 256, 1)
 
     del model  # release RAM
 
@@ -173,18 +183,18 @@ for train, test in kf.split(all_src_data,all_mask_data):
     from pipeline.data_pipeline import confirm_data
 
     test_vol = confirm_data(test_vol)
+    test_mask = confirm_data(test_mask)
 
-    train_gen = gen_chunk(train_vol, train_mask, slice_count=4,
+    train_gen = gen_chunk(train_vol, train_mask, slice_count=Slice_count,
                           batch_size=2)  # limited to GPU RAM
-    valid_gen = gen_chunk(test_vol, test_mask, slice_count=4, batch_size=2)
+    valid_gen = gen_chunk(test_vol, test_mask, slice_count=Slice_count, batch_size=2)
 
     train_aug_gen = gen_aug_chunk(train_gen)
 
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     from models import models
-    # import models_dropblock as M
-    train_func(model_name_id='define-your-model-name-here' + str(tag) + '_',
+    train_func(model_name_id='define-your-model-name-here' + '_fold' + str(tag) + '_',
                opt='Adam(lr = 1e-4)', _test_vol=test_vol, _test_mask=test_mask)
 
     tag = tag+1

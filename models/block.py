@@ -1,6 +1,6 @@
 import tensorflow as tf
 from keras.layers import *
-
+from keras import backend as K
 
 def _bernoulli(shape, mean):
     return tf.nn.relu(tf.sign(mean - tf.random_uniform(shape, minval=0, maxval=1, dtype=tf.float32)))
@@ -137,7 +137,7 @@ def resconv(inputlayer, outdim, name, is_batchnorm=True):
     return x2
 
 
-def slice_at_block(inputlayer, outdim, name='None'):
+def slice_at_block(inputlayer, outdim, _slice_count=4, name='None'):
     x_0 = TimeDistributed(DepthwiseConv2D(3, 1, padding='same', activation='relu', name=name + '_dw'),
                           name='T_' + name + '_dw')(
         inputlayer)
@@ -154,11 +154,11 @@ def slice_at_block(inputlayer, outdim, name='None'):
                    kernel_initializer='he_normal', activation='sigmoid', name=name + '_SABC')(x)
     x = TimeDistributed(Conv2D(
         1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)
-    x_3 = Reshape((4, 16, outdim // 16, 1))(x_3)
+    x_3 = Reshape((_slice_count, 16, outdim // 16, 1))(x_3)
     x_3 = ConvLSTM2D(filters=1, kernel_size=(5, 5), padding='same', return_sequences=True, go_backwards=False,
                      kernel_initializer='he_normal', activation='sigmoid', name=name + '_CABC')(x_3)
 
-    x_3 = Reshape((4, 1, 1, outdim))(x_3)
+    x_3 = Reshape((_slice_count, 1, 1, outdim))(x_3)
 
     x = Add()([x, x_3])
     x = TimeDistributed(Activation('sigmoid'))(x)
@@ -166,7 +166,7 @@ def slice_at_block(inputlayer, outdim, name='None'):
     x = Add()([x, inputlayer])
     return x
 
-def slice_with_block(inputlayer, outdim, name='None'):
+def slice_with_block(inputlayer, outdim, _slice_count=4, name='None'):
     x_0 = TimeDistributed(DepthwiseConv2D(3, 1, padding='same', activation='relu', name=name + '_dw'),
                           name='T_' + name + '_dw')(
         inputlayer)
@@ -186,11 +186,11 @@ def slice_with_block(inputlayer, outdim, name='None'):
     x = Add()([x_1, x_2])
     x = TimeDistributed(Conv2D(
         1, 3, padding='same', activation='sigmoid', name=name + '_3*3sig'))(x)
-    x_3 = Reshape((4, 16, outdim // 16, 1))(x_3)
+    x_3 = Reshape((_slice_count, 16, outdim // 16, 1))(x_3)
     x_3 = ConvLSTM2D(filters=1, kernel_size=(5, 5), padding='same', return_sequences=True, go_backwards=False,
                      kernel_initializer='he_normal', activation='sigmoid', name=name + '_CABC')(x_3)
 
-    x_3 = Reshape((4, 1, 1, outdim))(x_3)
+    x_3 = Reshape((_slice_count, 1, 1, outdim))(x_3)
 
     x = Add()([x, x_3])
     x = TimeDistributed(Activation('sigmoid'))(x)
