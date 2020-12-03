@@ -79,7 +79,7 @@ def DABC(input_size=(10, 256, 256, 1), opt=Adam(lr=1e-4), load_weighted=None, ):
     if load_weighted:
         model.load_weights(load_weighted)
 
-    model.compile(optimizer=opt, loss=[weighted_dice_with_CE], metrics=['accuracy', dice_coef])
+    model.compile(optimizer=opt, loss=[weighted_dice_with_CE], metrics=['accuracy', ])
 
     return model
 
