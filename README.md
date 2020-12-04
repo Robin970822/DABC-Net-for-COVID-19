@@ -45,7 +45,7 @@ Requirements:
 * simpleitk == 2.0
 * scipy == 1.1
 
-You need to download this repository and run following command:
+Install dependencies:
 
 ```
 cd path/to/repository/
@@ -139,14 +139,14 @@ In DABC-Net, we approximate Bayersian inference using [DropBlock](http://papers.
 * Lung: output of lung segmentation(optional)
 * Lesion: output of lesion segmentation
 
-Then, choose appropriate HU range (e.g. -1024~512) via right sliding window.
+Then, choose appropriate HU range (e.g. -1024~512) via right slide window.
 
 ![](fig/tool_visual.png)
 
 #### Progress predict:
 * Meta data: Csv format data. Put the path of data or click 'Demo' button to get an example.
 * Method: Use First two scans / First three scans / First scan to predict the progress of disease.
-* Output path: (optional) Results will be save in txt file. If this value is empty, file will save in working directory. 
+* Output path: (optional) Results will be saved to a text file. If this value is empty, file will save in working directory. 
 
 ![](fig/predict_ui.png)
 
@@ -198,7 +198,9 @@ DABC_uncertainty(nii_filename, save_filename, sample_value, uncertainty, sform_c
 For more detail, please refer to [notebook](https://colab.research.google.com/github/Robin970822/DABC-Net-for-COVID-19/blob/master/DABC_pipeline_demo.ipynb).
 
 ##  DABC-Net for Website
-coming soon
+
+
+- [ ] Update by Dec 20
 
 # Progress prediction
 
@@ -280,8 +282,8 @@ Dataset with Expert Annotations and Benchmark
 * [1] - Ma Jun, Ge Cheng, Wang Yixin, An Xingle, Gao Jiantao, … He Jian. (2020). COVID-19 CT Lung and Infection Segmentation Dataset (Version Verson 1.0) [Data set]. Zenodo. [DOI](https://zenodo.org/record/3757476)
 
 Data Sources
-* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! \| Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [<link>](https://Coronacases.org) [Accessed 20 March 2020].
-* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia \| Radiopaedia.Org. [online] Radiopaedia.org. Available at: [<link>](https://Radiopaedia.org) [Accessed 20 April 2020].
+* [2] - Paiva, O., 2020. CORONACASES.ORG - Helping Radiologists To Help People In More Than 100 Countries! \| Coronavirus Cases - 冠状病毒病例. [online] Coronacases.org. Available at: [link](https://Coronacases.org) [Accessed 20 March 2020].
+* [3] - Glick, Y., 2020. Viewing Playlist: COVID-19 Pneumonia \| Radiopaedia.Org. [online] Radiopaedia.org. Available at: [link](https://Radiopaedia.org) [Accessed 20 April 2020].
 
 # Notes
 
