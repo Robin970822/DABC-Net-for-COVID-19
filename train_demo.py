@@ -51,6 +51,14 @@ if np.max(all_mask_data) > 1:
 print('Data loaded !\n')
 
 '''
+pre-process
+'''
+from utils.pre_processing import my_PreProc
+all_src_data = np.swapaxes(all_src_data, 1, 3)  # (1573, 1, 256, 256)
+all_src_data = my_PreProc(all_src_data)
+all_src_data = np.swapaxes(all_src_data, 1, 3)  # (1573, 256, 256, 1)
+
+'''
 data generator
 '''
 def gen_chunk(in_img, in_mask, slice_count = 2, batch_size = 16):

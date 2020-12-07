@@ -1,7 +1,7 @@
 An experimental attempt for using data from other domain.
 
 TODO:
-- [ ] add preprocessing by Dec 06
+- [x] add preprocessing by Dec 06
 
 ### See also
 2D network
